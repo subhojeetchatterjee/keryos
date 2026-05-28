@@ -19,8 +19,8 @@ import base64
 import io
 import logging
 import os
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
-from typing import Any, cast
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any
 
 import numpy as np
 from PIL import Image
@@ -256,16 +256,16 @@ def get_best3_truecolor_auto(
     out: list[dict] = []
 
     with ThreadPoolExecutor(max_workers=fetch_workers) as pool:
-        ordered_futures: list[Future[dict[Any, Any] | None]] = []
-        for item in probed[:fetch_n]:
-            future = pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)
-            ordered_futures.append(cast(Future[dict[Any, Any] | None], future))
+        ordered_futures: list[Any] = [
+            pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)
+            for item in probed[:fetch_n]
+        ]
         for future in ordered_futures:
             if len(out) >= 3:
                 future.cancel()
                 continue
             try:
-                result = future.result()
+                result: dict[Any, Any] | None = future.result()
                 if result is not None:
                     out.append(result)
             except Exception as exc:

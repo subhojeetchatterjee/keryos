@@ -87,7 +87,7 @@ def _fetch_full_scene(
     full_px: int,
     max_cloud: int,
     llm_validator: Any | None,
-) -> dict | None:
+) -> dict[Any, Any] | None:
     """
     Phase 2: fetch full-resolution true-colour + SWIR for one candidate.
 

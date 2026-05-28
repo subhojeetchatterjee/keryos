@@ -16,12 +16,14 @@ _KERYOS_VERSION = "0.1"
 
 # ── Internal helpers ───────────────────────────────────────────────────────────
 
+
 def _compute_pooled_stats(aggregated_stats: dict) -> dict | None:
     """
     Weighted mean and pooled stDev across all valid daily intervals.
     Skips intervals where mean is NaN, None, or sampleCount == 0.
     Returns {"mean", "stDev", "passes", "totalPixels"} or None.
     """
+
     def _extract(interval: dict) -> dict | None:
         try:
             return interval["outputs"]["data"]["bands"]["B0"]["stats"]
@@ -54,7 +56,7 @@ def _compute_pooled_stats(aggregated_stats: dict) -> dict | None:
             if math.isnan(sd):
                 sd = 0.0
             w_means.append((m, n))
-            w_vars.append((sd ** 2 + m ** 2, n))
+            w_vars.append((sd**2 + m**2, n))
         except (TypeError, ValueError, KeyError):
             continue
 
@@ -64,7 +66,7 @@ def _compute_pooled_stats(aggregated_stats: dict) -> dict | None:
     N = sum(n for _, n in w_means)
     wt_mean = sum(m * n for m, n in w_means) / N
     wt_second = sum(v * n for v, n in w_vars) / N
-    wt_std = math.sqrt(max(0.0, wt_second - wt_mean ** 2))
+    wt_std = math.sqrt(max(0.0, wt_second - wt_mean**2))
     return {
         "mean": round(wt_mean, 4),
         "stDev": round(wt_std, 4),
@@ -77,6 +79,7 @@ def _aoi_metadata(aoi_geojson: dict, aoi_hash: str) -> dict:
     """Extract area, centroid, and vertex count from an AOI GeoJSON."""
     try:
         from agents.tools.geojson_utils import estimate_area_km2, extract_geometry
+
         geom = extract_geometry(aoi_geojson)
         area_km2 = estimate_area_km2(geom)
         coords = geom.get("coordinates", [[]])[0]
@@ -96,7 +99,13 @@ def _aoi_metadata(aoi_geojson: dict, aoi_hash: str) -> dict:
         }
     except Exception as exc:
         _log.debug("AOI metadata extraction failed: %s", exc)
-        return {"area_km2": None, "area_ha": None, "vertex_count": None, "centroid": None, "aoi_hash": aoi_hash}
+        return {
+            "area_km2": None,
+            "area_ha": None,
+            "vertex_count": None,
+            "centroid": None,
+            "aoi_hash": aoi_hash,
+        }
 
 
 def _interpret_ndvi(mean: float) -> dict:
@@ -175,6 +184,7 @@ def _compute_confidence(best: dict, pooled_stats: dict | None, enable_llm: bool)
 
 # ── Public API ─────────────────────────────────────────────────────────────────
 
+
 def get_report_bundle_for_ui(
     aoi_geojson: dict,
     date_from: str,
@@ -197,7 +207,12 @@ def get_report_bundle_for_ui(
     aoi_hash = hashlib.md5(json.dumps(aoi_geojson, sort_keys=True).encode()).hexdigest()[:8]
     _log.info(
         "Pipeline start | AOI hash=%s date=%s–%s crop=%s llm=%s narrative=%s",
-        aoi_hash, date_from, date_to, crop_type, enable_llm, enable_narrative,
+        aoi_hash,
+        date_from,
+        date_to,
+        crop_type,
+        enable_llm,
+        enable_narrative,
     )
 
     # ── 1. Scene discovery & image ranking ────────────────────────────────────
@@ -252,6 +267,7 @@ def get_report_bundle_for_ui(
     if enable_narrative:
         try:
             from agents.tools.llm_narrative import generate_claim_narrative
+
             stats_data = safe_extract_stats(stats) or {}
             ai_assessment = generate_claim_narrative(
                 best["png_b64"],
@@ -267,9 +283,7 @@ def get_report_bundle_for_ui(
                 date_to=date_to,
                 acquisition_dates=acquisition_dates,
                 cloud_cover=best.get("cloud_cover"),
-                ai_validated=(
-                    best.get("llm_validation", {}).get("is_valid") if enable_llm else None
-                ),
+                ai_validated=(best.get("llm_validation", {}).get("is_valid") if enable_llm else None),
             )
             ai_narrative = ai_assessment.get("executive_summary", "")
         except Exception as exc:
@@ -288,7 +302,6 @@ def get_report_bundle_for_ui(
         "pooled_stats": pooled_stats,
         "ai_narrative": ai_narrative,
         "ai_assessment": ai_assessment,
-
         # ── New structured fields ────────────────────────────────────────────
         "generated_at": generated_at,
         "aoi_metadata": aoi_meta,

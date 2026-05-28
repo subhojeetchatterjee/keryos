@@ -14,6 +14,7 @@ Public API:
   is_image_valid()         — unchanged brightness gate (backward compatible)
   get_best3_truecolor_auto() — unchanged signature, richer returned scene dicts
 """
+
 import base64
 import io
 import logging
@@ -41,6 +42,7 @@ _log = logging.getLogger(__name__)
 
 # ── Public helpers ─────────────────────────────────────────────────────────────
 
+
 def is_image_valid(png_bytes: bytes, min_brightness: float = 10.0) -> bool:
     """
     Return False if the image is mostly black / empty (mean luminance below threshold).
@@ -58,6 +60,7 @@ def is_image_valid(png_bytes: bytes, min_brightness: float = 10.0) -> bool:
 
 # ── Internal pipeline stages ───────────────────────────────────────────────────
 
+
 def _probe_candidate(
     aoi_geojson: dict,
     candidate: dict,
@@ -72,7 +75,7 @@ def _probe_candidate(
     scl_png = process_png_scl(aoi_geojson, dt, dt, size_px=probe_px, max_cloud_coverage=max_cloud)
     cloud_score = cloud_fraction_from_scl_png(scl_png)
     return {
-        "date":        dt,
+        "date": dt,
         "cloud_cover": candidate.get("cloud_cover"),
         "cloud_score": cloud_score,
     }
@@ -103,9 +106,7 @@ def _fetch_full_scene(
     dt = item["date"]
     try:
         # ── Step 1: fetch truecolor ───────────────────────────────────────────
-        full_png = process_png_truecolor(
-            aoi_geojson, dt, dt, size_px=full_px, max_cloud_coverage=max_cloud
-        )
+        full_png = process_png_truecolor(aoi_geojson, dt, dt, size_px=full_px, max_cloud_coverage=max_cloud)
 
         # ── Step 2: fast brightness gate (keep existing threshold) ────────────
         if not is_image_valid(full_png, min_brightness=10.0):
@@ -150,9 +151,7 @@ def _fetch_full_scene(
         if llm_validator is not None:
             llm_check = llm_validator(png_b64, dt)
             if not llm_check.get("is_valid", True):
-                _log.info(
-                    "Skipping %s (LLM): %s", dt, llm_check.get("reason", "")
-                )
+                _log.info("Skipping %s (LLM): %s", dt, llm_check.get("reason", ""))
                 return None
 
         # ── Step 5: fetch SWIR (only for accepted scenes) ─────────────────────
@@ -166,13 +165,13 @@ def _fetch_full_scene(
         quality: dict[str, Any] = {**img_quality, **scene_quality}
 
         return {
-            "date":          dt,
-            "cloud_cover":   item["cloud_cover"],
-            "cloud_score":   item["cloud_score"],
-            "png_b64":       png_b64,
-            "swir_png_b64":  swir_b64,
+            "date": dt,
+            "cloud_cover": item["cloud_cover"],
+            "cloud_score": item["cloud_score"],
+            "png_b64": png_b64,
+            "swir_png_b64": swir_b64,
             "llm_validation": llm_check,
-            "quality":       quality,
+            "quality": quality,
         }
 
     except Exception as exc:
@@ -181,6 +180,7 @@ def _fetch_full_scene(
 
 
 # ── Public entry point ─────────────────────────────────────────────────────────
+
 
 def get_best3_truecolor_auto(
     aoi_geojson: dict,
@@ -215,14 +215,13 @@ def get_best3_truecolor_auto(
         aoi_geojson, date_from, date_to, max_cloud=max_cloud, limit=catalog_limit
     )
     if not candidates:
-        raise RuntimeError(
-            "No candidates from Catalog API. Widen date range or increase max_cloud."
-        )
+        raise RuntimeError("No candidates from Catalog API. Widen date range or increase max_cloud.")
 
     llm_validator = None
     if enable_llm_validation:
         try:
             from agents.tools.image_validator_llm import validate_image_with_vertex_ai
+
             llm_validator = validate_image_with_vertex_ai
         except ImportError:
             _log.warning("LLM validation not available (missing dependencies)")
@@ -234,8 +233,7 @@ def get_best3_truecolor_auto(
     probed: list[dict] = []
     with ThreadPoolExecutor(max_workers=probe_workers) as pool:
         futures = {
-            pool.submit(_probe_candidate, aoi_geojson, c, probe_px, max_cloud): c
-            for c in top_candidates
+            pool.submit(_probe_candidate, aoi_geojson, c, probe_px, max_cloud): c for c in top_candidates
         }
         for future in as_completed(futures):
             try:
@@ -259,9 +257,7 @@ def get_best3_truecolor_auto(
 
     with ThreadPoolExecutor(max_workers=fetch_workers) as pool:
         ordered_futures = [
-            pool.submit(
-                _fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator
-            )
+            pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)
             for item in probed[:fetch_n]
         ]
         for future in ordered_futures:

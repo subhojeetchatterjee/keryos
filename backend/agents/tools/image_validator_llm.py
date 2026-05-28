@@ -72,16 +72,18 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
             model=_validator_model(),
             max_tokens=250,
             system=_VALIDATOR_SYSTEM,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {"type": "base64", "media_type": "image/png", "data": image_b64},
-                    },
-                    {"type": "text", "text": _VALIDATOR_PROMPT},
-                ],
-            }],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {"type": "base64", "media_type": "image/png", "data": image_b64},
+                        },
+                        {"type": "text", "text": _VALIDATOR_PROMPT},
+                    ],
+                }
+            ],
         )
         text = response.content[0].text.strip()
         _log.debug("Validator raw response for %s: %s", date, text[:120])

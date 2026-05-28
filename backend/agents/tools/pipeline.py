@@ -25,7 +25,7 @@ def get_report_bundle(aoi_geojson: dict, date_from: str, date_to: str) -> dict[s
         "date_from": date_from,
         "date_to": date_to,
         "best_date": best_day,
-        "best_image": best,               # includes png_b64, cloud_score, etc.
-        "alternatives": images[1:],        # 2 alternatives
+        "best_image": best,  # includes png_b64, cloud_score, etc.
+        "alternatives": images[1:],  # 2 alternatives
         "ndvi_stats": stats,
     }

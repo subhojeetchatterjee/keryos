@@ -28,8 +28,10 @@ def sh_request_with_retry(method: str, url: str, max_retries: int = 3, **kwargs)
             return resp
         except requests.exceptions.Timeout:
             if attempt < max_retries - 1:
-                wait = 2 ** attempt
-                _log.warning("SH API timeout (attempt %d/%d), retrying in %ds…", attempt + 1, max_retries, wait)
+                wait = 2**attempt
+                _log.warning(
+                    "SH API timeout (attempt %d/%d), retrying in %ds…", attempt + 1, max_retries, wait
+                )
                 time.sleep(wait)
             else:
                 raise
@@ -47,7 +49,9 @@ def _config_cdse() -> SHConfig:
     cfg.sh_client_id = os.getenv("SH_CLIENT_ID", "")
     cfg.sh_client_secret = os.getenv("SH_CLIENT_SECRET", "")
     cfg.sh_base_url = "https://sh.dataspace.copernicus.eu"
-    cfg.sh_token_url = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+    cfg.sh_token_url = (
+        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+    )
     return cfg
 
 
@@ -123,21 +127,25 @@ def scene_search_s2_l2a(
     scenes = []
     for item in results[:limit]:
         props = item.get("properties", {}) or {}
-        scenes.append({
-            "source": "SENTINEL2_L2A_CATALOG",
-            "scene_id": item.get("id", ""),
-            "date": _parse_dt_to_date(props.get("datetime", "")),
-            "cloud_pct": props.get("eo:cloud_cover", None),
-        })
+        scenes.append(
+            {
+                "source": "SENTINEL2_L2A_CATALOG",
+                "scene_id": item.get("id", ""),
+                "date": _parse_dt_to_date(props.get("datetime", "")),
+                "cloud_pct": props.get("eo:cloud_cover", None),
+            }
+        )
 
     geodata = {
         "selected_scenes": scenes,
-        "clipped_assets": [{
-            "type": "sentinelhub_processapi_bbox_crop",
-            "uri": "sentinelhub://process-api/sentinel-2-l2a",
-            "bands": ["B02(Blue)", "B03(Green)", "B04(Red)", "B08(NIR)", "B11(SWIR)"],
-            "gsd_m": 10,
-        }],
+        "clipped_assets": [
+            {
+                "type": "sentinelhub_processapi_bbox_crop",
+                "uri": "sentinelhub://process-api/sentinel-2-l2a",
+                "bands": ["B02(Blue)", "B03(Green)", "B04(Red)", "B08(NIR)", "B11(SWIR)"],
+                "gsd_m": 10,
+            }
+        ],
         "notes": (
             f"Catalog search over {time_interval} (user window {date_start}..{date_end}); "
             f"relaxed clouds {thresholds}; used_threshold={used_threshold}; returned={len(scenes)}."

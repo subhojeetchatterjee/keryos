@@ -44,6 +44,7 @@ class IntakeDeterministicAgent(BaseAgent):
         }
 
         import json
+
         yield Event(
             author=self.name,
             actions=EventActions(state_delta={"analysis_spec": json.dumps(analysis_spec)}),

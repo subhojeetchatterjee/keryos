@@ -31,13 +31,7 @@ function evaluatePixel(s) {
 """
 
 _STATS_PAYLOAD_BASE: dict = {
-    "calculations": {
-        "default": {
-            "statistics": {
-                "default": {"percentiles": {"k": [10, 25, 50, 75, 90]}}
-            }
-        }
-    }
+    "calculations": {"default": {"statistics": {"default": {"percentiles": {"k": [10, 25, 50, 75, 90]}}}}}
 }
 
 
@@ -120,5 +114,7 @@ def ndvi_stats_range(aoi_geojson: dict, date_from: str, date_to: str) -> dict:
         return {"error": r.text, "status": r.status_code}
 
     result: dict = r.json()
-    _log.debug("Range stats: %d intervals returned for %s–%s", len(result.get("data", [])), date_from, date_to)
+    _log.debug(
+        "Range stats: %d intervals returned for %s–%s", len(result.get("data", [])), date_from, date_to
+    )
     return result

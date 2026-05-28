@@ -125,14 +125,16 @@ function evaluatePixel(s) {
     payload = {
         "input": {
             "bounds": {"geometry": extract_geometry(aoi_geojson)},
-            "data": [{
-                "type": "sentinel-2-l2a",
-                "dataFilter": {
-                    "timeRange": {"from": f"{date_from}T00:00:00Z", "to": f"{date_to}T23:59:59Z"},
-                    "mosaickingOrder": "leastCC",
-                    "maxCloudCoverage": 90,
-                },
-            }],
+            "data": [
+                {
+                    "type": "sentinel-2-l2a",
+                    "dataFilter": {
+                        "timeRange": {"from": f"{date_from}T00:00:00Z", "to": f"{date_to}T23:59:59Z"},
+                        "mosaickingOrder": "leastCC",
+                        "maxCloudCoverage": 90,
+                    },
+                }
+            ],
         },
         "output": {
             "width": int(size_px),

@@ -22,15 +22,11 @@ AOI_NOT_POLYGON = (
     "Use the polygon tool in the top-left corner of the map."
 )
 AOI_INVALID_COORDS = (
-    "Polygon coordinates are outside valid map bounds. "
-    "Re-draw the polygon within the map area."
+    "Polygon coordinates are outside valid map bounds. Re-draw the polygon within the map area."
 )
 
 # --- API / network errors ---
-TIMEOUT = (
-    "Sentinel Hub timed out — their servers are busy right now. "
-    "Please wait 30 seconds and try again."
-)
+TIMEOUT = "Sentinel Hub timed out — their servers are busy right now. Please wait 30 seconds and try again."
 AUTH_FAILED = (
     "Authentication failed — check that SH_CLIENT_ID and SH_CLIENT_SECRET "
     "are set correctly in your environment."

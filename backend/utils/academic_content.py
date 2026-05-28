@@ -563,7 +563,7 @@ REFERENCES = [
             "Remote Sensing of Environment, 221, 551–568."
         ),
         "relevance": "Sentinel-2 for agricultural monitoring at field scale",
-        },
+    },
     {
         "key": "Zhu2015",
         "citation": (
@@ -585,10 +585,7 @@ REFERENCES = [
     },
     {
         "key": "Anthropic2024",
-        "citation": (
-            "Anthropic (2024). Claude 3 Model Card. "
-            "https://www.anthropic.com/claude-3-model-card"
-        ),
+        "citation": ("Anthropic (2024). Claude 3 Model Card. https://www.anthropic.com/claude-3-model-card"),
         "relevance": "AI model used for image validation and narrative generation",
     },
 ]
@@ -596,22 +593,22 @@ REFERENCES = [
 # ── Scoring weights (mirror image_score.py — kept in sync manually) ────────────
 
 SCORING_WEIGHTS = {
-    "cloud_clarity":       0.40,
-    "spatial_contrast":    0.25,
-    "brightness":          0.15,
-    "vegetation_proxy":    0.20,
+    "cloud_clarity": 0.40,
+    "spatial_contrast": 0.25,
+    "brightness": 0.15,
+    "vegetation_proxy": 0.20,
 }
 
 NDVI_THRESHOLDS = {
-    "healthy":  0.40,
+    "healthy": 0.40,
     "moderate": 0.20,
 }
 
 CLOUD_CLASSES_MASKED = {
-    1:  "Saturated or defective",
-    3:  "Cloud shadow",
-    8:  "Cloud medium probability",
-    9:  "Cloud high probability",
+    1: "Saturated or defective",
+    3: "Cloud shadow",
+    8: "Cloud medium probability",
+    9: "Cloud high probability",
     10: "Thin cirrus",
 }
 
@@ -894,11 +891,11 @@ COMPARISON_WITH_ALTERNATIVES = [
 
 # Sentinel-2 band reference used in this project
 SENTINEL2_BANDS = {
-    "B02": {"wavelength_nm": 490,  "resolution_m": 10,  "name": "Blue"},
-    "B03": {"wavelength_nm": 560,  "resolution_m": 10,  "name": "Green"},
-    "B04": {"wavelength_nm": 665,  "resolution_m": 10,  "name": "Red"},
-    "B08": {"wavelength_nm": 842,  "resolution_m": 10,  "name": "NIR (broad)"},
-    "B11": {"wavelength_nm": 1610, "resolution_m": 20,  "name": "SWIR-1"},
-    "B12": {"wavelength_nm": 2190, "resolution_m": 20,  "name": "SWIR-2"},
-    "SCL": {"wavelength_nm": None, "resolution_m": 20,  "name": "Scene Classification"},
+    "B02": {"wavelength_nm": 490, "resolution_m": 10, "name": "Blue"},
+    "B03": {"wavelength_nm": 560, "resolution_m": 10, "name": "Green"},
+    "B04": {"wavelength_nm": 665, "resolution_m": 10, "name": "Red"},
+    "B08": {"wavelength_nm": 842, "resolution_m": 10, "name": "NIR (broad)"},
+    "B11": {"wavelength_nm": 1610, "resolution_m": 20, "name": "SWIR-1"},
+    "B12": {"wavelength_nm": 2190, "resolution_m": 20, "name": "SWIR-2"},
+    "SCL": {"wavelength_nm": None, "resolution_m": 20, "name": "Scene Classification"},
 }

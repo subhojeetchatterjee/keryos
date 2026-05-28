@@ -38,7 +38,9 @@ class GeoDataDeterministicAgent(BaseAgent):
                 yield Event(author=self.name, actions=EventActions(state_delta={"geodata_result": err}))
                 return
         else:
-            err = json.dumps({"error": f"analysis_spec must be str or dict, got: {type(analysis_spec_raw).__name__}"})
+            err = json.dumps(
+                {"error": f"analysis_spec must be str or dict, got: {type(analysis_spec_raw).__name__}"}
+            )
             yield Event(author=self.name, actions=EventActions(state_delta={"geodata_result": err}))
             return
 
@@ -52,7 +54,9 @@ class GeoDataDeterministicAgent(BaseAgent):
                 yield Event(author=self.name, actions=EventActions(state_delta={"geodata_result": err}))
                 return
         elif not isinstance(aoi_geojson, dict):
-            err = json.dumps({"error": f"aoi_geojson must be dict or JSON string, got: {type(aoi_geojson).__name__}"})
+            err = json.dumps(
+                {"error": f"aoi_geojson must be dict or JSON string, got: {type(aoi_geojson).__name__}"}
+            )
             yield Event(author=self.name, actions=EventActions(state_delta={"geodata_result": err}))
             return
 

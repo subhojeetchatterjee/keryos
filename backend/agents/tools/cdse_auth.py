@@ -8,10 +8,7 @@ from agents.tools.retry import with_retry
 
 _log = logging.getLogger(__name__)
 
-_TOKEN_URL = (
-    "https://identity.dataspace.copernicus.eu"
-    "/auth/realms/CDSE/protocol/openid-connect/token"
-)
+_TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
 _CACHE: dict[str, object] = {"token": None, "exp": 0}
 
 
@@ -25,9 +22,7 @@ def get_token(max_retries: int = 3) -> str:
     client_id = os.environ.get("SH_CLIENT_ID", "")
     client_secret = os.environ.get("SH_CLIENT_SECRET", "")
     if not client_id or not client_secret:
-        raise OSError(
-            "SH_CLIENT_ID and SH_CLIENT_SECRET must be set to authenticate with Sentinel Hub."
-        )
+        raise OSError("SH_CLIENT_ID and SH_CLIENT_SECRET must be set to authenticate with Sentinel Hub.")
 
     payload = {
         "grant_type": "client_credentials",

@@ -59,17 +59,19 @@ def _build_evidence_block(
     ai_validated: bool | None,
 ) -> str:
     """Build the deterministic evidence block injected verbatim into the AI prompt."""
-    pct     = ndvi_stats.get("percentiles") or {}
-    pooled  = pooled_stats or {}
-    interp  = ndvi_interpretation or {}
-    conf    = confidence or {}
-    aoi     = aoi_metadata or {}
+    pct = ndvi_stats.get("percentiles") or {}
+    pooled = pooled_stats or {}
+    interp = ndvi_interpretation or {}
+    conf = confidence or {}
+    aoi = aoi_metadata or {}
     centroid = aoi.get("centroid") or {}
     dates_str = ", ".join(acquisition_dates) if acquisition_dates else best_date
 
     ai_val_str = (
-        "Validated (Claude 3 Haiku)" if ai_validated is True
-        else "Flagged by AI validator" if ai_validated is False
+        "Validated (Claude 3 Haiku)"
+        if ai_validated is True
+        else "Flagged by AI validator"
+        if ai_validated is False
         else "AI validation not enabled"
     )
 
@@ -89,40 +91,40 @@ Analysis Context
   All dates evaluated:  {dates_str}
 
 Area of Interest
-  Area:     {aoi.get('area_km2', 'N/A')} km²  ({aoi.get('area_ha', 'N/A')} ha)
-  Centroid: {centroid.get('lat', 'N/A')}°N,  {centroid.get('lon', 'N/A')}°E
-  AOI ref:  {aoi.get('aoi_hash', 'N/A')}
+  Area:     {aoi.get("area_km2", "N/A")} km²  ({aoi.get("area_ha", "N/A")} ha)
+  Centroid: {centroid.get("lat", "N/A")}°N,  {centroid.get("lon", "N/A")}°E
+  AOI ref:  {aoi.get("aoi_hash", "N/A")}
 
 Scene Quality  ({best_date})
   Cloud score (SCL-derived):  {cloud_score:.1%}
-  Catalog cloud cover:        {cloud_cover if cloud_cover is not None else 'N/A'}
+  Catalog cloud cover:        {cloud_cover if cloud_cover is not None else "N/A"}
   Image validation status:    {ai_val_str}
 
 Per-Date NDVI Statistics  ({best_date}, 20 m/pixel, cloud-masked)
-  Mean NDVI:         {_fmt(ndvi_stats.get('mean'))}
-  Median NDVI (P50): {_fmt(pct.get('50.0'))}
-  Std deviation:     {_fmt(ndvi_stats.get('stDev', ndvi_stats.get('std')))}
-  P25 – P75:         {_fmt(pct.get('25.0'))} – {_fmt(pct.get('75.0'))}
+  Mean NDVI:         {_fmt(ndvi_stats.get("mean"))}
+  Median NDVI (P50): {_fmt(pct.get("50.0"))}
+  Std deviation:     {_fmt(ndvi_stats.get("stDev", ndvi_stats.get("std")))}
+  P25 – P75:         {_fmt(pct.get("25.0"))} – {_fmt(pct.get("75.0"))}
 
 Temporal Composite  ({date_from} to {date_to})
-  Composite mean NDVI: {_fmt(pooled.get('mean'))}
-  Pooled std dev:      {_fmt(pooled.get('stDev'))}
-  Valid passes:        {pooled.get('passes', 'N/A')}
+  Composite mean NDVI: {_fmt(pooled.get("mean"))}
+  Pooled std dev:      {_fmt(pooled.get("stDev"))}
+  Valid passes:        {pooled.get("passes", "N/A")}
   Total valid pixels:  {total_pixels}
   (Weighted pooling across all cloud-free passes; SCL classes 1,3,8,9,10 excluded)
 
 Deterministic Vegetation Assessment
-  Health class:   {interp.get('health_class', 'N/A')}  ({interp.get('health_label', 'N/A')})
+  Health class:   {interp.get("health_class", "N/A")}  ({interp.get("health_label", "N/A")})
   NDVI thresholds: ≥ 0.40 → Healthy Vegetation
                    0.20–0.39 → Moderate Stress / Sparse Cover
                    < 0.20 → Severe Stress / Bare Soil
-  Composite {_fmt(pooled.get('mean'))} → class: {interp.get('health_class', 'N/A')}
-  Claim signal: {interp.get('claim_signal', 'N/A')}
+  Composite {_fmt(pooled.get("mean"))} → class: {interp.get("health_class", "N/A")}
+  Claim signal: {interp.get("claim_signal", "N/A")}
 
 Pre-Computed Confidence  (do not recalculate or contradict)
-  Overall:              {conf.get('label', 'N/A')}  ({conf.get('overall', 0):.0%})
-  Cloud clarity factor: {conf.get('cloud_clarity', 0):.0%}   (55% weight)
-  Temporal coverage:    {conf.get('temporal_coverage', 0):.0%}   (35% weight, {conf.get('passes', 0)} passes)
+  Overall:              {conf.get("label", "N/A")}  ({conf.get("overall", 0):.0%})
+  Cloud clarity factor: {conf.get("cloud_clarity", 0):.0%}   (55% weight)
+  Temporal coverage:    {conf.get("temporal_coverage", 0):.0%}   (35% weight, {conf.get("passes", 0)} passes)
   AI validation:        10% weight\
 """
 
@@ -169,33 +171,27 @@ def _deterministic_fallback(
     unavailable.  Every sentence is constructed from actual data values — no
     hallucination possible.
     """
-    interp  = ndvi_interpretation or {}
-    conf    = confidence or {}
-    pooled  = pooled_stats or {}
+    interp = ndvi_interpretation or {}
+    conf = confidence or {}
+    pooled = pooled_stats or {}
 
-    mean_val   = pooled.get("mean")
-    passes     = pooled.get("passes", 0)
+    mean_val = pooled.get("mean")
+    passes = pooled.get("passes", 0)
     conf_label = conf.get("label", "Low")
-    health_label  = interp.get("health_label", "Unknown")
-    claim_signal  = interp.get("claim_signal", "")
+    health_label = interp.get("health_label", "Unknown")
+    claim_signal = interp.get("claim_signal", "")
     recommendation = interp.get("recommendation", "Field verification required.")
 
-    mean_str   = f"{float(mean_val):.3f}" if mean_val is not None else "unavailable"
+    mean_str = f"{float(mean_val):.3f}" if mean_val is not None else "unavailable"
     passes_str = f"{passes} satellite pass{'es' if passes != 1 else ''}"
-    cloud_str  = f"{cloud_score:.1%}"
-    std_str    = _fmt(pooled.get("stDev"))
+    cloud_str = f"{cloud_score:.1%}"
+    std_str = _fmt(pooled.get("stDev"))
 
-    caveats: list[str] = [
-        "AI narrative generation was unavailable; this assessment is fully deterministic."
-    ]
+    caveats: list[str] = ["AI narrative generation was unavailable; this assessment is fully deterministic."]
     if passes < 3:
-        caveats.append(
-            f"Only {passes_str} contributed to the composite — temporal reliability is limited."
-        )
+        caveats.append(f"Only {passes_str} contributed to the composite — temporal reliability is limited.")
     if cloud_score > 0.30:
-        caveats.append(
-            f"Best scene cloud score of {cloud_str} may reduce spatial coverage of valid pixels."
-        )
+        caveats.append(f"Best scene cloud score of {cloud_str} may reduce spatial coverage of valid pixels.")
     if mean_val is None:
         caveats.append("Composite NDVI statistics unavailable for this date range.")
 
@@ -287,10 +283,12 @@ def generate_claim_narrative(
 
     content: list[dict] = []
     if image_b64:
-        content.append({
-            "type": "image",
-            "source": {"type": "base64", "media_type": "image/png", "data": image_b64},
-        })
+        content.append(
+            {
+                "type": "image",
+                "source": {"type": "base64", "media_type": "image/png", "data": image_b64},
+            }
+        )
     content.append({"type": "text", "text": prompt})
 
     try:
@@ -306,8 +304,12 @@ def generate_claim_narrative(
         parsed = _parse_response(raw)
         if parsed and isinstance(parsed, dict):
             required = {
-                "executive_summary", "technical_analysis", "insurance_interpretation",
-                "confidence_explanation", "caveats", "grounding_flags",
+                "executive_summary",
+                "technical_analysis",
+                "insurance_interpretation",
+                "confidence_explanation",
+                "caveats",
+                "grounding_flags",
             }
             if required.issubset(parsed.keys()):
                 parsed["fallback"] = False

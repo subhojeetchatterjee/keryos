@@ -1,4 +1,5 @@
 """Reusable Streamlit UI render functions, separated from main app logic."""
+
 import base64
 
 import streamlit as st
@@ -394,8 +395,10 @@ def inject_accessibility_css() -> None:
 
 # ── Hero & Status ──────────────────────────────────────────────────────────────
 
+
 def render_hero_header() -> None:
-    st.markdown("""
+    st.markdown(
+        """
 <div class="k-hero">
   <div class="k-hero-wordmark">KERY<em>OS</em></div>
   <p class="k-hero-sub">Satellite Crop Verification Engine &nbsp;·&nbsp; Prevented-Sowing Claim Analysis</p>
@@ -407,25 +410,31 @@ def render_hero_header() -> None:
     <span class="k-tag k-tag-b">Cloud Masking</span>
   </div>
 </div>
-""", unsafe_allow_html=True)
+""",
+        unsafe_allow_html=True,
+    )
 
 
 def render_system_status(enable_llm: bool = False, enable_narrative: bool = False) -> None:
-    llm_cls  = "k-chip-on" if enable_llm       else "k-chip-off"
-    llm_lbl  = "AI Validation  ON"  if enable_llm       else "AI Validation  OFF"
-    nar_cls  = "k-chip-on" if enable_narrative  else "k-chip-off"
-    nar_lbl  = "AI Narrative  ON"   if enable_narrative  else "AI Narrative  OFF"
-    st.markdown(f"""
+    llm_cls = "k-chip-on" if enable_llm else "k-chip-off"
+    llm_lbl = "AI Validation  ON" if enable_llm else "AI Validation  OFF"
+    nar_cls = "k-chip-on" if enable_narrative else "k-chip-off"
+    nar_lbl = "AI Narrative  ON" if enable_narrative else "AI Narrative  OFF"
+    st.markdown(
+        f"""
 <div class="k-statusbar">
   <div class="k-chip k-chip-on"><span class="k-dot"></span>Sentinel Hub API</div>
   <div class="k-chip k-chip-on"><span class="k-dot"></span>Sentinel-2 L2A</div>
   <div class="k-chip {llm_cls}"><span class="k-dot"></span>{llm_lbl}</div>
   <div class="k-chip {nar_cls}"><span class="k-dot"></span>{nar_lbl}</div>
 </div>
-""", unsafe_allow_html=True)
+""",
+        unsafe_allow_html=True,
+    )
 
 
 # ── Results sections ───────────────────────────────────────────────────────────
+
 
 def render_best_scene(report: dict) -> None:
     col1, col2 = st.columns([3, 2])
@@ -447,32 +456,33 @@ def render_best_scene(report: dict) -> None:
 
         llm_val = report["best_image"].get("llm_validation")
         if llm_val:
-            conf     = llm_val.get("confidence", 0)
+            conf = llm_val.get("confidence", 0)
             observed = llm_val.get("observed_features", "")
             if llm_val.get("is_valid", True):
                 st.markdown(
                     f'<div style="margin-top:0.85rem;padding:0.8rem;'
-                    f'background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.18);'
+                    f"background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.18);"
                     f'border-radius:8px;">'
                     f'<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">'
                     f'<span style="width:5px;height:5px;border-radius:50%;background:#00d68f;'
                     f'box-shadow:0 0 5px #00d68f;display:inline-block;flex-shrink:0;"></span>'
-                    f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.72rem;'
+                    f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.72rem;"
                     f'color:#00d68f;">AI Validated</span>'
                     f'<span class="ai-badge">Claude 3 Haiku</span></div>'
-                    f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.77rem;'
+                    f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.77rem;"
                     f'color:#94a3b8;">Confidence&nbsp;<strong style="color:#00d68f;">'
-                    f'{conf:.0%}</strong></span>'
+                    f"{conf:.0%}</strong></span>"
                     + (
                         f'<p style="margin:0.45rem 0 0;font-size:0.78rem;color:#94a3b8;'
                         f'line-height:1.5;font-style:italic;">{observed}</p>'
-                        if observed else ""
+                        if observed
+                        else ""
                     )
-                    + '</div>',
+                    + "</div>",
                     unsafe_allow_html=True,
                 )
             else:
-                reason   = llm_val.get("reason", "Unknown issue")
+                reason = llm_val.get("reason", "Unknown issue")
                 st.warning(f"AI flagged: {reason}")
                 if observed:
                     st.caption(f"Observed: {observed}")
@@ -485,29 +495,32 @@ def render_best_scene(report: dict) -> None:
 
 def _render_quality_card(quality: dict) -> None:
     """Compact quality scorecard shown inside the scene metrics column."""
-    grade     = quality.get("quality_grade", "?")
+    grade = quality.get("quality_grade", "?")
     composite = quality.get("composite_score", 0.0)
-    mb        = quality.get("mean_brightness", 0.0)
-    ct        = quality.get("contrast", 0.0)
-    veg       = quality.get("veg_fraction", 0.0)
-    clarity   = quality.get("cloud_clarity", 0.0)
-    entropy   = quality.get("spatial_entropy", 0.0)
+    mb = quality.get("mean_brightness", 0.0)
+    ct = quality.get("contrast", 0.0)
+    veg = quality.get("veg_fraction", 0.0)
+    clarity = quality.get("cloud_clarity", 0.0)
+    entropy = quality.get("spatial_entropy", 0.0)
 
     grade_hex = {
-        "A": "#00d68f", "B": "#38bdf8", "C": "#fbbf24",
-        "D": "#f87171", "F": "#ef4444",
+        "A": "#00d68f",
+        "B": "#38bdf8",
+        "C": "#fbbf24",
+        "D": "#f87171",
+        "F": "#ef4444",
     }.get(grade, "#94a3b8")
 
     rejection = quality.get("rejection_reason")
     if rejection:
         st.markdown(
             f'<div style="margin-top:0.85rem;padding:0.7rem 0.85rem;'
-            f'background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.22);'
+            f"background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.22);"
             f'border-radius:8px;">'
-            f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;'
+            f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.68rem;"
             f'color:#f87171;text-transform:uppercase;letter-spacing:0.05em;">Rejected</span>'
             f'<p style="margin:0.3rem 0 0;font-size:0.75rem;color:#94a3b8;">{rejection}</p>'
-            f'</div>',
+            f"</div>",
             unsafe_allow_html=True,
         )
         return
@@ -519,10 +532,10 @@ def _render_quality_card(quality: dict) -> None:
             f'<div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);'
             f'width:80px;overflow:hidden;display:inline-block;vertical-align:middle;">'
             f'<div style="height:100%;width:{w}px;background:{color};border-radius:2px;"></div>'
-            f'</div>'
+            f"</div>"
         )
 
-    b_score  = quality.get("brightness_score", 0.0)
+    b_score = quality.get("brightness_score", 0.0)
     ct_score = quality.get("contrast_score", 0.0)
     vg_score = quality.get("vegetation_score", 0.0)
 
@@ -531,46 +544,46 @@ def _render_quality_card(quality: dict) -> None:
         f'background:rgba(0,0,0,0.18);border:1px solid var(--border);border-radius:8px;">'
         # Header: grade badge + composite %
         f'<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.63rem;'
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.63rem;"
         f'letter-spacing:0.08em;text-transform:uppercase;color:var(--text-2);">Scene Quality</span>'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:1.05rem;'
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:1.05rem;"
         f'font-weight:700;color:{grade_hex};">{grade}</span>'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;'
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.78rem;"
         f'color:{grade_hex};">{composite:.0%}</span>'
-        f'</div>'
+        f"</div>"
         # Component rows
         f'<div style="display:flex;flex-direction:column;gap:0.3rem;">'
         f'<div style="display:flex;align-items:center;justify-content:space-between;">'
         f'<span style="font-size:0.71rem;color:var(--text-2);min-width:80px;">Cloud clarity</span>'
-        f'{_bar(clarity, "#00d68f")}'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;'
+        f"{_bar(clarity, '#00d68f')}"
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.68rem;"
         f'color:var(--text-1);min-width:36px;text-align:right;">{clarity:.0%}</span>'
-        f'</div>'
+        f"</div>"
         f'<div style="display:flex;align-items:center;justify-content:space-between;">'
         f'<span style="font-size:0.71rem;color:var(--text-2);min-width:80px;">Spatial detail</span>'
-        f'{_bar(ct_score, "#38bdf8")}'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;'
+        f"{_bar(ct_score, '#38bdf8')}"
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.68rem;"
         f'color:var(--text-1);min-width:36px;text-align:right;">{ct:.0f}</span>'
-        f'</div>'
+        f"</div>"
         f'<div style="display:flex;align-items:center;justify-content:space-between;">'
         f'<span style="font-size:0.71rem;color:var(--text-2);min-width:80px;">Brightness</span>'
-        f'{_bar(b_score, "#fbbf24")}'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;'
+        f"{_bar(b_score, '#fbbf24')}"
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.68rem;"
         f'color:var(--text-1);min-width:36px;text-align:right;">{mb:.0f}</span>'
-        f'</div>'
+        f"</div>"
         f'<div style="display:flex;align-items:center;justify-content:space-between;">'
         f'<span style="font-size:0.71rem;color:var(--text-2);min-width:80px;">Vegetation</span>'
-        f'{_bar(vg_score, "#4ade80")}'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;'
+        f"{_bar(vg_score, '#4ade80')}"
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.68rem;"
         f'color:var(--text-1);min-width:36px;text-align:right;">{veg:.0%}</span>'
-        f'</div>'
+        f"</div>"
         f'<div style="display:flex;align-items:center;justify-content:space-between;">'
         f'<span style="font-size:0.71rem;color:var(--text-2);min-width:80px;">Entropy</span>'
-        f'{_bar(min(1.0, entropy / 5.5), "#a78bfa")}'
-        f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.68rem;'
+        f"{_bar(min(1.0, entropy / 5.5), '#a78bfa')}"
+        f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.68rem;"
         f'color:var(--text-1);min-width:36px;text-align:right;">{entropy:.2f}</span>'
-        f'</div>'
-        f'</div></div>',
+        f"</div>"
+        f"</div></div>",
         unsafe_allow_html=True,
     )
 
@@ -597,7 +610,8 @@ def render_ndvi_section(report: dict) -> None:
         c2.metric("Satellite Passes", str(pooled["passes"]))
         c3.metric("Pooled Std Dev", f"{pooled['stDev']:.3f}")
 
-        st.markdown(f"""
+        st.markdown(
+            f"""
 <div class="ndvi-wrap">
   <div class="ndvi-bar">
     <div class="ndvi-pin" style="left:{pct:.1f}%;"></div>
@@ -605,20 +619,22 @@ def render_ndvi_section(report: dict) -> None:
   <div class="ndvi-axis"><span>−1  bare soil</span><span>0</span><span>+1  dense vegetation</span></div>
   <span class="ndvi-badge {health_cls}">{health_label}</span>
   <span style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#475569;margin-left:0.8rem;">
-    {pooled['totalPixels']:,} valid pixels &nbsp;·&nbsp; {pooled['passes']} passes
+    {pooled["totalPixels"]:,} valid pixels &nbsp;·&nbsp; {pooled["passes"]} passes
   </span>
 </div>
-""", unsafe_allow_html=True)
+""",
+            unsafe_allow_html=True,
+        )
     else:
         st.warning(COMPOSITE_UNAVAILABLE)
 
     st.markdown("---")
     st.markdown(
         '<p style="font-size:0.78rem;color:#94a3b8;margin:0 0 0.6rem;">'
-        'Per-date snapshot '
+        "Per-date snapshot "
         '<span style="color:#475569;">'
-        '— single scene; see composite above for field-level statistics'
-        '</span></p>',
+        "— single scene; see composite above for field-level statistics"
+        "</span></p>",
         unsafe_allow_html=True,
     )
 
@@ -628,10 +644,12 @@ def render_ndvi_section(report: dict) -> None:
         if stats_data is None:
             ndvi_raw = ndvi_stats if isinstance(ndvi_stats, dict) else {}
             if "error" in ndvi_raw:
-                st.warning(NDVI_API_ERROR.format(
-                    status=ndvi_raw.get("status", "?"),
-                    detail=str(ndvi_raw.get("error", "unknown"))[:300],
-                ))
+                st.warning(
+                    NDVI_API_ERROR.format(
+                        status=ndvi_raw.get("status", "?"),
+                        detail=str(ndvi_raw.get("error", "unknown"))[:300],
+                    )
+                )
             elif ndvi_raw.get("data") == []:
                 st.info(f"ℹ️ {NDVI_NO_PIXELS}")
             else:
@@ -647,14 +665,16 @@ def render_ndvi_section(report: dict) -> None:
 
             if pct_data:
                 with st.expander("NDVI Percentile Breakdown"):
-                    st.table({
-                        "Percentile": ["25th", "50th (Median)", "75th"],
-                        "NDVI Value": [
-                            f"{float(pct_data.get('25.0', 0)):.3f}",
-                            f"{float(pct_data.get('50.0', 0)):.3f}",
-                            f"{float(pct_data.get('75.0', 0)):.3f}",
-                        ],
-                    })
+                    st.table(
+                        {
+                            "Percentile": ["25th", "50th (Median)", "75th"],
+                            "NDVI Value": [
+                                f"{float(pct_data.get('25.0', 0)):.3f}",
+                                f"{float(pct_data.get('50.0', 0)):.3f}",
+                                f"{float(pct_data.get('75.0', 0)):.3f}",
+                            ],
+                        }
+                    )
 
 
 def render_alternatives(report: dict) -> None:
@@ -693,15 +713,16 @@ def render_ai_narrative(report: dict) -> None:
         model_lbl = "Deterministic fallback" if is_fallback else "Claude 3.5 Sonnet · Vertex AI"
         fallback_badge = (
             '<span class="k-chip k-chip-off" style="font-size:0.62rem;padding:0.13rem 0.5rem;">'
-            'Fallback</span>'
-            if is_fallback else ""
+            "Fallback</span>"
+            if is_fallback
+            else ""
         )
 
         st.markdown(
             f'<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">'
-            f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;'
+            f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.65rem;"
             f'letter-spacing:0.06em;color:var(--text-2);text-transform:uppercase;">'
-            f'AI Assessment</span>'
+            f"AI Assessment</span>"
             f'<span class="ai-badge">{model_lbl}</span>{fallback_badge}</div>',
             unsafe_allow_html=True,
         )
@@ -712,10 +733,10 @@ def render_ai_narrative(report: dict) -> None:
             st.markdown(
                 f'<div class="k-card" style="border-left:3px solid var(--accent-g);">'
                 f'<div style="font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;'
-                f'color:var(--text-2);margin-bottom:0.45rem;font-family:\'JetBrains Mono\',monospace;">'
-                f'Executive Summary</div>'
+                f"color:var(--text-2);margin-bottom:0.45rem;font-family:'JetBrains Mono',monospace;\">"
+                f"Executive Summary</div>"
                 f'<p style="margin:0;font-size:0.95rem;line-height:1.7;color:var(--text-1);">'
-                f'{exec_s}</p></div>',
+                f"{exec_s}</p></div>",
                 unsafe_allow_html=True,
             )
 
@@ -727,10 +748,10 @@ def render_ai_narrative(report: dict) -> None:
                 st.markdown(
                     f'<div class="k-card">'
                     f'<div style="font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;'
-                    f'color:var(--accent-b);margin-bottom:0.4rem;'
-                    f'font-family:\'JetBrains Mono\',monospace;">Technical Analysis</div>'
+                    f"color:var(--accent-b);margin-bottom:0.4rem;"
+                    f"font-family:'JetBrains Mono',monospace;\">Technical Analysis</div>"
                     f'<p style="margin:0;font-size:0.84rem;line-height:1.65;color:var(--text-1);">'
-                    f'{tech}</p></div>',
+                    f"{tech}</p></div>",
                     unsafe_allow_html=True,
                 )
         with col_i:
@@ -739,10 +760,10 @@ def render_ai_narrative(report: dict) -> None:
                 st.markdown(
                     f'<div class="k-card">'
                     f'<div style="font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;'
-                    f'color:var(--accent-a);margin-bottom:0.4rem;'
-                    f'font-family:\'JetBrains Mono\',monospace;">Insurance Interpretation</div>'
+                    f"color:var(--accent-a);margin-bottom:0.4rem;"
+                    f"font-family:'JetBrains Mono',monospace;\">Insurance Interpretation</div>"
                     f'<p style="margin:0;font-size:0.84rem;line-height:1.65;color:var(--text-1);">'
-                    f'{ins}</p></div>',
+                    f"{ins}</p></div>",
                     unsafe_allow_html=True,
                 )
 
@@ -752,8 +773,8 @@ def render_ai_narrative(report: dict) -> None:
             st.markdown(
                 f'<div style="padding:0.5rem 0.85rem;background:rgba(0,214,143,0.04);'
                 f'border:1px solid var(--border);border-radius:var(--r);margin:0.5rem 0;">'
-                f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.63rem;'
-                f'letter-spacing:0.06em;color:var(--accent-g);text-transform:uppercase;'
+                f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.63rem;"
+                f"letter-spacing:0.06em;color:var(--accent-g);text-transform:uppercase;"
                 f'margin-right:0.5rem;">Confidence Basis</span>'
                 f'<span style="font-size:0.83rem;color:var(--text-2);">{conf_exp}</span></div>',
                 unsafe_allow_html=True,
@@ -761,15 +782,15 @@ def render_ai_narrative(report: dict) -> None:
 
         # ── Caveats + grounding flags in expanders ────────────────────────────
         caveats = assessment.get("caveats") or []
-        flags   = assessment.get("grounding_flags") or []
+        flags = assessment.get("grounding_flags") or []
 
         if caveats or flags:
             with st.expander("Caveats & Evidence Trail"):
                 if caveats:
                     st.markdown(
                         '<p style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;'
-                        'color:var(--text-3);margin:0 0 0.4rem;'
-                        'font-family:\'JetBrains Mono\',monospace;">Caveats</p>',
+                        "color:var(--text-3);margin:0 0 0.4rem;"
+                        "font-family:'JetBrains Mono',monospace;\">Caveats</p>",
                         unsafe_allow_html=True,
                     )
                     for cav in caveats:
@@ -780,13 +801,12 @@ def render_ai_narrative(report: dict) -> None:
                 if flags and not is_fallback:
                     st.markdown(
                         '<p style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;'
-                        'color:var(--text-3);margin:0.75rem 0 0.4rem;'
-                        'font-family:\'JetBrains Mono\',monospace;">Metrics cited</p>',
+                        "color:var(--text-3);margin:0.75rem 0 0.4rem;"
+                        "font-family:'JetBrains Mono',monospace;\">Metrics cited</p>",
                         unsafe_allow_html=True,
                     )
                     flags_html = "".join(
-                        f'<span class="k-tag k-tag-b" style="font-size:0.6rem;">{f}</span>'
-                        for f in flags
+                        f'<span class="k-tag k-tag-b" style="font-size:0.6rem;">{f}</span>' for f in flags
                     )
                     st.markdown(
                         f'<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">{flags_html}</div>',
@@ -797,11 +817,11 @@ def render_ai_narrative(report: dict) -> None:
         st.markdown(
             f'<div class="k-card">'
             f'<div style="margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem;">'
-            f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;'
+            f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.65rem;"
             f'letter-spacing:0.06em;color:var(--text-2);text-transform:uppercase;">'
             f'Assessment</span><span class="ai-badge">Claude 3.5 Sonnet · Vertex AI</span></div>'
             f'<p style="margin:0;font-size:0.95rem;line-height:1.7;color:var(--text-1);">'
-            f'{legacy_text}</p></div>',
+            f"{legacy_text}</p></div>",
             unsafe_allow_html=True,
         )
 
@@ -913,6 +933,7 @@ across all passes, giving a true picture of within-field variability.
 #  Academic / Methodology tab functions
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def _md_section(title: str, body: str) -> None:
     """Render a styled section heading and markdown body."""
     st.markdown(
@@ -934,8 +955,7 @@ def render_methodology_tab() -> None:
     )
 
     st.markdown(
-        f'<p style="font-size:0.88rem;color:var(--text-2);margin-bottom:1.2rem;">'
-        f'{PROJECT_SUBTITLE}</p>',
+        f'<p style="font-size:0.88rem;color:var(--text-2);margin-bottom:1.2rem;">{PROJECT_SUBTITLE}</p>',
         unsafe_allow_html=True,
     )
 
@@ -964,17 +984,20 @@ def render_methodology_tab() -> None:
 
 def _render_band_table() -> None:
     from utils.academic_content import SENTINEL2_BANDS
-    st.markdown('<p class="k-head" style="margin-top:0.75rem;">Sentinel-2 Bands Used in Keryos</p>',
-                unsafe_allow_html=True)
+
+    st.markdown(
+        '<p class="k-head" style="margin-top:0.75rem;">Sentinel-2 Bands Used in Keryos</p>',
+        unsafe_allow_html=True,
+    )
     rows = "".join(
-        f'<tr>'
-        f'<td style="font-family:\'JetBrains Mono\',monospace;color:#38bdf8;">{band}</td>'
+        f"<tr>"
+        f"<td style=\"font-family:'JetBrains Mono',monospace;color:#38bdf8;\">{band}</td>"
         f'<td style="color:var(--text-2);">{info["name"]}</td>'
-        f'<td style="font-family:\'JetBrains Mono\',monospace;color:var(--text-1);">'
-        f'{info["wavelength_nm"]} nm</td>'
-        f'<td style="font-family:\'JetBrains Mono\',monospace;color:#00d68f;">'
-        f'{info["resolution_m"]} m</td>'
-        f'</tr>'
+        f"<td style=\"font-family:'JetBrains Mono',monospace;color:var(--text-1);\">"
+        f"{info['wavelength_nm']} nm</td>"
+        f"<td style=\"font-family:'JetBrains Mono',monospace;color:#00d68f;\">"
+        f"{info['resolution_m']} m</td>"
+        f"</tr>"
         for band, info in SENTINEL2_BANDS.items()
     )
     st.markdown(
@@ -984,36 +1007,37 @@ def _render_band_table() -> None:
         f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);">Name</th>'
         f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);">Wavelength</th>'
         f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);">Resolution</th>'
-        f'</tr></thead>'
-        f'<tbody>{rows}</tbody></table>',
+        f"</tr></thead>"
+        f"<tbody>{rows}</tbody></table>",
         unsafe_allow_html=True,
     )
 
 
 def _render_ndvi_reference_card() -> None:
     """Compact NDVI interpretation scale."""
-    st.markdown('<p class="k-head" style="margin-top:0.75rem;">NDVI Interpretation Scale</p>',
-                unsafe_allow_html=True)
+    st.markdown(
+        '<p class="k-head" style="margin-top:0.75rem;">NDVI Interpretation Scale</p>', unsafe_allow_html=True
+    )
     rows_data = [
         ("-1.0 to 0.0", "Water, deep shadow", "#38bdf8", "0%"),
-        ("0.0 to 0.1",  "Bare rock, sand, snow", "#94a3b8", "5%"),
-        ("0.1 to 0.2",  "Sparse / degraded vegetation", "#fbbf24", "15%"),
-        ("0.2 to 0.4",  "Moderate stress — early crop or sparse cover", "#f97316", "30%"),
-        ("0.4 to 0.6",  "Moderate–good crop cover — paddy tillering", "#4ade80", "65%"),
-        ("0.6 to 1.0",  "Dense healthy vegetation", "#00d68f", "100%"),
+        ("0.0 to 0.1", "Bare rock, sand, snow", "#94a3b8", "5%"),
+        ("0.1 to 0.2", "Sparse / degraded vegetation", "#fbbf24", "15%"),
+        ("0.2 to 0.4", "Moderate stress — early crop or sparse cover", "#f97316", "30%"),
+        ("0.4 to 0.6", "Moderate–good crop cover — paddy tillering", "#4ade80", "65%"),
+        ("0.6 to 1.0", "Dense healthy vegetation", "#00d68f", "100%"),
     ]
     rows_html = ""
     for rng, interp, color, bar_w in rows_data:
         rows_html += (
-            f'<tr>'
-            f'<td style="font-family:\'JetBrains Mono\',monospace;color:{color};'
+            f"<tr>"
+            f"<td style=\"font-family:'JetBrains Mono',monospace;color:{color};"
             f'padding:0.3rem 0.6rem;">{rng}</td>'
             f'<td style="color:var(--text-1);padding:0.3rem 0.6rem;">{interp}</td>'
             f'<td style="padding:0.3rem 0.6rem;">'
             f'<div style="height:6px;border-radius:3px;background:rgba(255,255,255,0.08);width:120px;">'
             f'<div style="height:100%;width:{bar_w};background:{color};border-radius:3px;"></div>'
-            f'</div></td>'
-            f'</tr>'
+            f"</div></td>"
+            f"</tr>"
         )
     st.markdown(
         f'<table style="width:100%;border-collapse:collapse;font-size:0.82rem;">'
@@ -1021,7 +1045,7 @@ def _render_ndvi_reference_card() -> None:
         f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);">NDVI Range</th>'
         f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);">Interpretation</th>'
         f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);">Level</th>'
-        f'</tr></thead><tbody>{rows_html}</tbody></table>',
+        f"</tr></thead><tbody>{rows_html}</tbody></table>",
         unsafe_allow_html=True,
     )
 
@@ -1029,6 +1053,7 @@ def _render_ndvi_reference_card() -> None:
 def render_pipeline_diagram() -> None:
     """Render the ASCII processing pipeline diagram."""
     from utils.academic_content import PIPELINE_DIAGRAM
+
     st.markdown('<p class="k-head">Processing Pipeline</p>', unsafe_allow_html=True)
     st.code(PIPELINE_DIAGRAM, language=None)
 
@@ -1039,6 +1064,7 @@ def render_architecture_tab() -> None:
         ARCHITECTURE_OVERVIEW,
         SOFTWARE_ENGINEERING_NOTES,
     )
+
     with st.expander("System Architecture", expanded=True):
         st.markdown(ARCHITECTURE_OVERVIEW)
     with st.expander("Software Engineering Practices", expanded=False):
@@ -1059,6 +1085,7 @@ def render_limitations_tab() -> None:
 def render_future_work_tab() -> None:
     """Future scalability and research directions."""
     from utils.academic_content import FUTURE_WORK
+
     with st.expander("Future Scalability & Research Directions", expanded=True):
         st.markdown(FUTURE_WORK)
 
@@ -1066,17 +1093,18 @@ def render_future_work_tab() -> None:
 def render_references_tab() -> None:
     """Academic references panel."""
     from utils.academic_content import REFERENCES
+
     st.markdown('<p class="k-head">Academic References</p>', unsafe_allow_html=True)
     for ref in REFERENCES:
         st.markdown(
             f'<div style="padding:0.55rem 0.85rem;border:1px solid var(--border);'
             f'border-radius:var(--r);margin-bottom:0.5rem;background:var(--bg-glass);">'
-            f'<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;'
+            f"<div style=\"font-family:'JetBrains Mono',monospace;font-size:0.65rem;"
             f'color:var(--accent-b);margin-bottom:0.2rem;">[{ref["key"]}]</div>'
             f'<p style="margin:0 0 0.2rem;font-size:0.82rem;color:var(--text-1);">'
-            f'{ref["citation"]}</p>'
+            f"{ref['citation']}</p>"
             f'<span style="font-size:0.72rem;color:var(--text-3);">{ref["relevance"]}</span>'
-            f'</div>',
+            f"</div>",
             unsafe_allow_html=True,
         )
 
@@ -1109,7 +1137,7 @@ def render_reproducibility_panel(report: dict) -> None:
                     f'<div style="display:flex;justify-content:space-between;'
                     f'padding:0.2rem 0;border-bottom:1px solid var(--border);">'
                     f'<span style="font-size:0.78rem;color:var(--text-2);">{k}</span>'
-                    f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;'
+                    f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.78rem;"
                     f'color:var(--text-1);">{v}</span></div>',
                     unsafe_allow_html=True,
                 )
@@ -1123,7 +1151,7 @@ def render_reproducibility_panel(report: dict) -> None:
                     f'<div style="display:flex;justify-content:space-between;'
                     f'padding:0.2rem 0;border-bottom:1px solid var(--border);">'
                     f'<span style="font-size:0.78rem;color:var(--text-2);">{k}</span>'
-                    f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;'
+                    f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.78rem;"
                     f'color:#fbbf24;">{v}</span></div>',
                     unsafe_allow_html=True,
                 )
@@ -1138,7 +1166,7 @@ def render_reproducibility_panel(report: dict) -> None:
                     f'<div style="margin-bottom:0.4rem;">'
                     f'<div style="display:flex;justify-content:space-between;margin-bottom:0.15rem;">'
                     f'<span style="font-size:0.78rem;color:var(--text-2);">{k}</span>'
-                    f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;'
+                    f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.78rem;"
                     f'color:#00d68f;">{pct}</span></div>'
                     f'<div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.06);'
                     f'width:100%;overflow:hidden;">'
@@ -1154,7 +1182,7 @@ def render_reproducibility_panel(report: dict) -> None:
                     f'<div style="display:flex;justify-content:space-between;'
                     f'padding:0.2rem 0;border-bottom:1px solid var(--border);">'
                     f'<span style="font-size:0.78rem;color:var(--text-2);">{k}</span>'
-                    f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.75rem;'
+                    f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.75rem;"
                     f'color:var(--text-1);">{v}</span></div>',
                     unsafe_allow_html=True,
                 )
@@ -1167,15 +1195,16 @@ def render_reproducibility_panel(report: dict) -> None:
             st.markdown(
                 f'<div style="display:flex;align-items:center;gap:0.5rem;'
                 f'padding:0.2rem 0;border-bottom:1px solid var(--border);">'
-                f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;'
+                f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.65rem;"
                 f'color:#00d68f;min-width:20px;">{i:02d}</span>'
                 f'<span style="font-size:0.78rem;color:var(--text-2);">{step}</span>'
-                f'</div>',
+                f"</div>",
                 unsafe_allow_html=True,
             )
 
 
 # ── New academic render functions ──────────────────────────────────────────────
+
 
 def render_research_questions() -> None:
     """Display the four research questions with motivation and approach."""
@@ -1188,24 +1217,24 @@ def render_research_questions() -> None:
     )
 
     for rq in RESEARCH_QUESTIONS:
-        num   = rq["number"]
-        q     = rq["question"]
+        num = rq["number"]
+        q = rq["question"]
         motiv = rq["motivation"]
-        appr  = rq["approach"]
+        appr = rq["approach"]
 
         st.markdown(
             f'<div class="k-card" style="margin-bottom:0.75rem;">'
             f'<div style="display:flex;align-items:flex-start;gap:0.65rem;">'
-            f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.9rem;'
+            f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.9rem;"
             f'font-weight:700;color:#00d68f;flex-shrink:0;padding-top:0.05rem;">{num}</span>'
-            f'<div>'
+            f"<div>"
             f'<p style="margin:0 0 0.45rem;font-size:0.93rem;font-weight:600;'
             f'color:var(--text-1);line-height:1.5;">{q}</p>'
             f'<p style="margin:0 0 0.25rem;font-size:0.8rem;color:var(--text-2);">'
             f'<strong style="color:#38bdf8;">Motivation:</strong> {motiv}</p>'
             f'<p style="margin:0;font-size:0.8rem;color:var(--text-2);">'
             f'<strong style="color:#4ade80;">Approach:</strong> {appr}</p>'
-            f'</div></div></div>',
+            f"</div></div></div>",
             unsafe_allow_html=True,
         )
 
@@ -1215,90 +1244,117 @@ def render_visual_pipeline() -> None:
     Visual step-by-step pipeline diagram using Streamlit components.
     Replaces the ASCII-only view with an interactive card layout.
     """
-    st.markdown('<p class="k-head">Processing Pipeline — Visual View</p>',
-                unsafe_allow_html=True)
+    st.markdown('<p class="k-head">Processing Pipeline — Visual View</p>', unsafe_allow_html=True)
 
     phases = [
         {
-            "num": "01", "name": "Input Validation",
+            "num": "01",
+            "name": "Input Validation",
             "color": "#38bdf8",
-            "steps": ["WGS84 coordinate bounds check", "Area: 0.01–50,000 km²",
-                      "Date range: 5–365 days, no future dates"],
+            "steps": [
+                "WGS84 coordinate bounds check",
+                "Area: 0.01–50,000 km²",
+                "Date range: 5–365 days, no future dates",
+            ],
             "params": "validate_aoi() · geojson_utils.py",
         },
         {
-            "num": "02", "name": "Scene Discovery",
+            "num": "02",
+            "name": "Scene Discovery",
             "color": "#00d68f",
-            "steps": ["Sentinel Hub Catalog API query",
-                      "Filter: eo:cloud_cover < 90%",
-                      "De-duplicate by calendar date",
-                      "Sort by catalog cloud cover ascending"],
+            "steps": [
+                "Sentinel Hub Catalog API query",
+                "Filter: eo:cloud_cover < 90%",
+                "De-duplicate by calendar date",
+                "Sort by catalog cloud cover ascending",
+            ],
             "params": "catalog_limit=100 · max_cloud=90%",
         },
         {
-            "num": "03", "name": "Phase 1: SCL Probe  (parallel)",
+            "num": "03",
+            "name": "Phase 1: SCL Probe  (parallel)",
             "color": "#00d68f",
-            "steps": ["Fetch 128×128 SCL thumbnail per candidate",
-                      "Decode: class = round(red_channel / 255 × 11)",
-                      "Cloud fraction from classes {1, 3, 8, 9, 10}",
-                      "Sort by cloud_score ascending"],
+            "steps": [
+                "Fetch 128×128 SCL thumbnail per candidate",
+                "Decode: class = round(red_channel / 255 × 11)",
+                "Cloud fraction from classes {1, 3, 8, 9, 10}",
+                "Sort by cloud_score ascending",
+            ],
             "params": "probe_px=128 · 6 workers · top 12 candidates",
         },
         {
-            "num": "04", "name": "Phase 2: Full-Res Fetch  (parallel)",
+            "num": "04",
+            "name": "Phase 2: Full-Res Fetch  (parallel)",
             "color": "#00d68f",
-            "steps": ["Fetch 512×512 true-colour PNG",
-                      "Brightness gate: mean luminance ≥ 10",
-                      "Image quality analysis (8 metrics)",
-                      "Composite scoring (cloud 40% + contrast 25% + brightness 15% + veg 20%)",
-                      "Hard-reject filter",
-                      "[Optional] Claude 3 Haiku validation",
-                      "Fetch 512×512 SWIR PNG"],
+            "steps": [
+                "Fetch 512×512 true-colour PNG",
+                "Brightness gate: mean luminance ≥ 10",
+                "Image quality analysis (8 metrics)",
+                "Composite scoring (cloud 40% + contrast 25% + brightness 15% + veg 20%)",
+                "Hard-reject filter",
+                "[Optional] Claude 3 Haiku validation",
+                "Fetch 512×512 SWIR PNG",
+            ],
             "params": "full_px=512 · 4 workers · top 6 probed",
         },
         {
-            "num": "05", "name": "NDVI Statistics",
+            "num": "05",
+            "name": "NDVI Statistics",
             "color": "#a78bfa",
-            "steps": ["Statistics API: per-day NDVI (best date)",
-                      "Statistics API: range NDVI (full window, P1D intervals)",
-                      "Cloud mask: SCL classes 8, 9, 10 excluded",
-                      "Percentiles: P10, P25, P50, P75, P90"],
+            "steps": [
+                "Statistics API: per-day NDVI (best date)",
+                "Statistics API: range NDVI (full window, P1D intervals)",
+                "Cloud mask: SCL classes 8, 9, 10 excluded",
+                "Percentiles: P10, P25, P50, P75, P90",
+            ],
             "params": "resx=20 m · resy=20 m · evalscript NDVI_SCL_MASK",
         },
         {
-            "num": "06", "name": "Pooled Composite",
+            "num": "06",
+            "name": "Pooled Composite",
             "color": "#a78bfa",
-            "steps": ["Weighted mean: Σ(mᵢ·nᵢ) / Σnᵢ",
-                      "Pooled variance: Σ((σᵢ²+mᵢ²)·nᵢ)/Σnᵢ − μ²",
-                      "Skip NaN or zero-count intervals",
-                      "Record passes count + total pixels"],
+            "steps": [
+                "Weighted mean: Σ(mᵢ·nᵢ) / Σnᵢ",
+                "Pooled variance: Σ((σᵢ²+mᵢ²)·nᵢ)/Σnᵢ − μ²",
+                "Skip NaN or zero-count intervals",
+                "Record passes count + total pixels",
+            ],
             "params": "weight = sampleCount per interval",
         },
         {
-            "num": "07", "name": "Deterministic Interpretation",
+            "num": "07",
+            "name": "Deterministic Interpretation",
             "color": "#fbbf24",
-            "steps": ["NDVI health class (≥ 0.40 / 0.20–0.39 / < 0.20)",
-                      "Confidence score (cloud 55% + temporal 35% + AI 10%)",
-                      "Claim signal + recommendation generation",
-                      "AOI metadata (area, centroid, hash)"],
+            "steps": [
+                "NDVI health class (≥ 0.40 / 0.20–0.39 / < 0.20)",
+                "Confidence score (cloud 55% + temporal 35% + AI 10%)",
+                "Claim signal + recommendation generation",
+                "AOI metadata (area, centroid, hash)",
+            ],
             "params": "thresholds: 0.40 healthy · 0.20 moderate",
         },
         {
-            "num": "08", "name": "[Optional] AI Narrative",
+            "num": "08",
+            "name": "[Optional] AI Narrative",
             "color": "#f87171",
-            "steps": ["Evidence pack injected verbatim into prompt",
-                      "System prompt: 8 grounding rules enforced",
-                      "Structured JSON output (6 sections)",
-                      "Deterministic fallback on any failure"],
+            "steps": [
+                "Evidence pack injected verbatim into prompt",
+                "System prompt: 8 grounding rules enforced",
+                "Structured JSON output (6 sections)",
+                "Deterministic fallback on any failure",
+            ],
             "params": "Claude 3.5 Sonnet · Vertex AI · max_tokens=800",
         },
         {
-            "num": "09", "name": "Report Assembly",
+            "num": "09",
+            "name": "Report Assembly",
             "color": "#38bdf8",
-            "steps": ["All deterministic + AI fields merged",
-                      "Reproducibility parameters embedded",
-                      "Integrity hash (SHA-256) computed",
-                      "UI render · PDF export · JSON metadata"],
+            "steps": [
+                "All deterministic + AI fields merged",
+                "Reproducibility parameters embedded",
+                "Integrity hash (SHA-256) computed",
+                "UI render · PDF export · JSON metadata",
+            ],
             "params": "report_bundle.py → UI / PDF generator",
         },
     ]
@@ -1312,20 +1368,20 @@ def render_visual_pipeline() -> None:
             f'<div style="display:flex;gap:0.75rem;margin-bottom:0.6rem;">'
             f'<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">'
             f'<div style="width:34px;height:34px;border-radius:50%;background:{phase["color"]}20;'
-            f'border:2px solid {phase["color"]};display:flex;align-items:center;'
-            f'justify-content:center;font-family:\'JetBrains Mono\',monospace;'
+            f"border:2px solid {phase['color']};display:flex;align-items:center;"
+            f"justify-content:center;font-family:'JetBrains Mono',monospace;"
             f'font-size:0.65rem;font-weight:700;color:{phase["color"]};">{phase["num"]}</div>'
             f'<div style="width:2px;flex:1;background:rgba(255,255,255,0.05);'
             f'margin:0.2rem 0;min-height:10px;"></div></div>'
             f'<div style="flex:1;background:var(--bg-glass);border:1px solid var(--border);'
-            f'border-left:3px solid {phase["color"]};border-radius:var(--r);'
+            f"border-left:3px solid {phase['color']};border-radius:var(--r);"
             f'padding:0.65rem 0.9rem;margin-bottom:0;">'
             f'<div style="font-weight:700;font-size:0.88rem;color:var(--text-1);'
             f'margin-bottom:0.3rem;">{phase["name"]}</div>'
             f'<ul style="margin:0 0 0.35rem 1rem;padding:0;">{steps_html}</ul>'
-            f'<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;'
+            f"<div style=\"font-family:'JetBrains Mono',monospace;font-size:0.65rem;"
             f'color:{phase["color"]};opacity:0.7;">{phase["params"]}</div>'
-            f'</div></div>',
+            f"</div></div>",
             unsafe_allow_html=True,
         )
 
@@ -1357,11 +1413,11 @@ def render_design_decisions() -> None:
         with st.expander(dd["decision"]):
             st.markdown(
                 f'<p style="font-size:0.85rem;color:var(--text-1);margin-bottom:0.5rem;">'
-                f'{dd["rationale"]}</p>'
+                f"{dd['rationale']}</p>"
                 f'<div style="padding:0.45rem 0.75rem;background:rgba(251,191,36,0.06);'
-                f'border-left:3px solid #fbbf24;border-radius:4px;'
+                f"border-left:3px solid #fbbf24;border-radius:4px;"
                 f'font-size:0.78rem;color:#fbbf24;">'
-                f'<strong>Trade-off:</strong> {dd["trade_off"]}</div>',
+                f"<strong>Trade-off:</strong> {dd['trade_off']}</div>",
                 unsafe_allow_html=True,
             )
 
@@ -1370,15 +1426,22 @@ def render_comparison_table() -> None:
     """Comparison with alternative remote sensing data sources."""
     from utils.academic_content import COMPARISON_WITH_ALTERNATIVES
 
-    st.markdown('<p class="k-head">Comparison with Alternative Approaches</p>',
-                unsafe_allow_html=True)
+    st.markdown('<p class="k-head">Comparison with Alternative Approaches</p>', unsafe_allow_html=True)
 
     header_cols = ["Approach", "Resolution", "Revisit", "Cost", "Cloud-immune", "Scalability", "Objectivity"]
-    col_keys    = ["approach", "spatial_res", "temporal_res", "cost", "cloud_immunity", "scalability", "objectivity"]
+    col_keys = [
+        "approach",
+        "spatial_res",
+        "temporal_res",
+        "cost",
+        "cloud_immunity",
+        "scalability",
+        "objectivity",
+    ]
 
     header_html = "".join(
         f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);'
-        f'font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;'
+        f"font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;"
         f'background:var(--bg-2);">{h}</th>'
         for h in header_cols
     )
@@ -1391,28 +1454,28 @@ def render_comparison_table() -> None:
         cells = "".join(
             f'<td style="padding:0.35rem 0.6rem;font-size:0.78rem;'
             f'color:{"#00d68f" if is_selected else "var(--text-1)"};">'
-            f'{row.get(k, "")}</td>'
+            f"{row.get(k, '')}</td>"
             for k in col_keys
         )
         rows_html += (
             f'<tr style="background:{bg};{border_left}">'
-            f'{cells}'
+            f"{cells}"
             f'<td style="padding:0.35rem 0.6rem;font-size:0.72rem;'
             f'color:var(--text-3);font-style:italic;">'
-            f'{row.get("why_not", "")}</td></tr>'
+            f"{row.get('why_not', '')}</td></tr>"
         )
 
     # Add "Reason" header
     header_html += (
         '<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);'
-        'font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;'
+        "font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;"
         'background:var(--bg-2);">Decision</th>'
     )
 
     st.markdown(
         f'<div style="overflow-x:auto;">'
         f'<table style="width:100%;border-collapse:collapse;font-size:0.82rem;">'
-        f'<thead><tr>{header_html}</tr></thead>'
-        f'<tbody>{rows_html}</tbody></table></div>',
+        f"<thead><tr>{header_html}</tr></thead>"
+        f"<tbody>{rows_html}</tbody></table></div>",
         unsafe_allow_html=True,
     )

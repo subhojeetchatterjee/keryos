@@ -1,4 +1,5 @@
 """Centralised environment variable access with clear error messages for missing secrets."""
+
 import os
 
 _DESCRIPTIONS: dict[str, str] = {

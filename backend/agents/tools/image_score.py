@@ -5,6 +5,7 @@ Two layers:
   1. Cloud fraction from SCL PNG  (used in the lightweight probe phase)
   2. Full image quality analysis  (used after full-res fetch in Phase 2)
 """
+
 from io import BytesIO
 
 import numpy as np
@@ -37,6 +38,7 @@ def cloud_fraction_from_scl_png(png_bytes: bytes) -> float:
 
 
 # ── Full image quality analysis ────────────────────────────────────────────────
+
 
 def _empty_quality() -> dict:
     return {
@@ -99,9 +101,7 @@ def analyse_truecolor_quality(png_bytes: bytes) -> dict:
 
         # Saturation fraction: near-white with low colour variance (cloud, snow, haze)
         rgb_mean = (r + g + b) / 3.0
-        rgb_std = np.sqrt(
-            ((r - rgb_mean) ** 2 + (g - rgb_mean) ** 2 + (b - rgb_mean) ** 2) / 3.0
-        )
+        rgb_std = np.sqrt(((r - rgb_mean) ** 2 + (g - rgb_mean) ** 2 + (b - rgb_mean) ** 2) / 3.0)
         sat_mask = (rgb_mean[valid_mask] > 210.0) & (rgb_std[valid_mask] < 25.0)
         sat_frac = float(sat_mask.sum()) / max(len(lum_valid), 1)
 
@@ -128,14 +128,14 @@ def analyse_truecolor_quality(png_bytes: bytes) -> dict:
             entropy = 0.0
 
         return {
-            "mean_brightness":    round(mean_brightness, 2),
-            "contrast":           round(contrast, 2),
-            "dark_fraction":      round(dark_frac, 4),
+            "mean_brightness": round(mean_brightness, 2),
+            "contrast": round(contrast, 2),
+            "dark_fraction": round(dark_frac, 4),
             "saturation_fraction": round(sat_frac, 4),
-            "veg_index_mean":     round(veg_index_mean, 4),
-            "veg_fraction":       round(veg_frac, 4),
-            "spatial_entropy":    round(entropy, 4),
-            "valid_fraction":     round(valid_frac, 4),
+            "veg_index_mean": round(veg_index_mean, 4),
+            "veg_fraction": round(veg_frac, 4),
+            "spatial_entropy": round(entropy, 4),
+            "valid_fraction": round(valid_frac, 4),
         }
 
     except Exception:
@@ -172,13 +172,13 @@ def score_scene_quality(cloud_fraction: float, image_quality: dict) -> dict:
       usable            bool
       rejection_reason  str | None
     """
-    mb      = float(image_quality.get("mean_brightness", 0.0))
-    ct      = float(image_quality.get("contrast", 0.0))
-    dk      = float(image_quality.get("dark_fraction", 0.0))
-    sat     = float(image_quality.get("saturation_fraction", 0.0))
-    veg     = float(image_quality.get("veg_fraction", 0.0))
-    valid   = float(image_quality.get("valid_fraction", 0.0))
-    cf      = float(cloud_fraction)
+    mb = float(image_quality.get("mean_brightness", 0.0))
+    ct = float(image_quality.get("contrast", 0.0))
+    dk = float(image_quality.get("dark_fraction", 0.0))
+    sat = float(image_quality.get("saturation_fraction", 0.0))
+    veg = float(image_quality.get("veg_fraction", 0.0))
+    valid = float(image_quality.get("valid_fraction", 0.0))
+    cf = float(cloud_fraction)
 
     # ── Hard rejection ────────────────────────────────────────────────────────
     rejection_reason: str | None = None
@@ -195,13 +195,13 @@ def score_scene_quality(cloud_fraction: float, image_quality: dict) -> dict:
 
     if rejection_reason:
         return {
-            "composite_score":  0.0,
-            "quality_grade":    "F",
-            "cloud_clarity":    round(max(0.0, 1.0 - cf), 4),
+            "composite_score": 0.0,
+            "quality_grade": "F",
+            "cloud_clarity": round(max(0.0, 1.0 - cf), 4),
             "brightness_score": 0.0,
-            "contrast_score":   0.0,
+            "contrast_score": 0.0,
             "vegetation_score": 0.0,
-            "usable":           False,
+            "usable": False,
             "rejection_reason": rejection_reason,
         }
 
@@ -228,28 +228,29 @@ def score_scene_quality(cloud_fraction: float, image_quality: dict) -> dict:
     vegetation_score = min(1.0, veg * 1.5)
 
     composite = (
-        cloud_clarity     * 0.40
-        + brightness_score * 0.15
-        + contrast_score   * 0.25
-        + vegetation_score * 0.20
+        cloud_clarity * 0.40 + brightness_score * 0.15 + contrast_score * 0.25 + vegetation_score * 0.20
     )
     composite = round(min(1.0, max(0.0, composite)), 4)
 
     grade = (
-        "A" if composite >= 0.75 else
-        "B" if composite >= 0.55 else
-        "C" if composite >= 0.35 else
-        "D" if composite >= 0.20 else
-        "F"
+        "A"
+        if composite >= 0.75
+        else "B"
+        if composite >= 0.55
+        else "C"
+        if composite >= 0.35
+        else "D"
+        if composite >= 0.20
+        else "F"
     )
 
     return {
-        "composite_score":  composite,
-        "quality_grade":    grade,
-        "cloud_clarity":    round(cloud_clarity, 4),
+        "composite_score": composite,
+        "quality_grade": grade,
+        "cloud_clarity": round(cloud_clarity, 4),
         "brightness_score": round(brightness_score, 4),
-        "contrast_score":   round(contrast_score, 4),
+        "contrast_score": round(contrast_score, 4),
         "vegetation_score": round(vegetation_score, 4),
-        "usable":           True,
+        "usable": True,
         "rejection_reason": None,
     }

@@ -38,8 +38,7 @@ def extract_geometry(aoi_geojson: dict) -> dict:
 
     else:
         raise ValueError(
-            f"Unrecognised GeoJSON type: {geo_type!r}. "
-            "Expected Polygon, Feature, or FeatureCollection."
+            f"Unrecognised GeoJSON type: {geo_type!r}. Expected Polygon, Feature, or FeatureCollection."
         )
 
 
@@ -98,8 +97,7 @@ def validate_aoi(aoi_geojson: dict) -> dict:
             )
         if not (-90.0 <= lat <= 90.0):
             raise ValueError(
-                f"Latitude {lat:.4f} is out of range (−90 … 90). "
-                "Re-draw the polygon within valid map bounds."
+                f"Latitude {lat:.4f} is out of range (−90 … 90). Re-draw the polygon within valid map bounds."
             )
 
     # Validate area

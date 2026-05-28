@@ -149,9 +149,7 @@ def main() -> None:
     render_system_status(enable_llm, enable_narrative)
 
     # --- Tabs ---
-    tab_analysis, tab_methodology, tab_about = st.tabs(
-        ["Analysis", "Methodology", "About"]
-    )
+    tab_analysis, tab_methodology, tab_about = st.tabs(["Analysis", "Methodology", "About"])
 
     with tab_analysis:
         _run_analysis_tab(enable_llm, enable_narrative, crop_type, date_from, date_to)
@@ -176,8 +174,7 @@ def _run_analysis_tab(
     # --- Map ---
     st.markdown('<p class="k-head">Area of Interest</p>', unsafe_allow_html=True)
     st.caption(
-        "Draw a polygon using the toolbar (top-left of the map). "
-        "Minimum 1 hectare · Maximum 50 000 km²."
+        "Draw a polygon using the toolbar (top-left of the map). Minimum 1 hectare · Maximum 50 000 km²."
     )
     m = folium.Map(location=[22.9, 88.3], zoom_start=10)
     Draw(
@@ -221,8 +218,8 @@ def _run_analysis_tab(
             f'<div class="aoi-card">'
             f'<span class="aoi-dot"></span>'
             f'AOI Active &nbsp;<span class="aoi-sub">· {n_verts} vertices · hash {aoi_hash[:6]}'
-            f' · draw a new polygon to replace</span>'
-            f'</div>',
+            f" · draw a new polygon to replace</span>"
+            f"</div>",
             unsafe_allow_html=True,
         )
     else:
@@ -313,16 +310,18 @@ def _run_methodology_tab() -> None:
     """Methodology & Documentation tab."""
     import streamlit as st
 
-    tab_rq, tab_m, tab_pipe, tab_eval, tab_dd, tab_lim, tab_future, tab_refs = st.tabs([
-        "Research Questions",
-        "Methodology",
-        "Pipeline",
-        "Evaluation",
-        "Design Decisions",
-        "Limitations",
-        "Future Work",
-        "References",
-    ])
+    tab_rq, tab_m, tab_pipe, tab_eval, tab_dd, tab_lim, tab_future, tab_refs = st.tabs(
+        [
+            "Research Questions",
+            "Methodology",
+            "Pipeline",
+            "Evaluation",
+            "Design Decisions",
+            "Limitations",
+            "Future Work",
+            "References",
+        ]
+    )
 
     with tab_rq:
         render_research_questions()

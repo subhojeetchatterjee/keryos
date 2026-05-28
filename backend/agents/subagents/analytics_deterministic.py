@@ -46,7 +46,7 @@ class AnalyticsDeterministicAgent(BaseAgent):
             metrics = {
                 "source": "Sentinel Hub Statistics API",
                 "stats": stats,
-                "interpretation": "Real-time NDVI statistics computed over the selected AOI and time range."
+                "interpretation": "Real-time NDVI statistics computed over the selected AOI and time range.",
             }
 
             metrics_result_json = json.dumps(metrics)

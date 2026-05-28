@@ -1,4 +1,5 @@
 """Shared retry + exponential backoff with jitter for all HTTP callers."""
+
 import logging
 import random
 import time
@@ -33,16 +34,25 @@ def with_retry(
         except requests.exceptions.Timeout as exc:
             last_exc = exc
             if attempt < max_retries - 1:
-                delay = min(base_delay * (2 ** attempt), max_delay) * random.random()
-                _log.warning("Request timed out (attempt %d/%d), retrying in %.1fs", attempt + 1, max_retries, delay)
+                delay = min(base_delay * (2**attempt), max_delay) * random.random()
+                _log.warning(
+                    "Request timed out (attempt %d/%d), retrying in %.1fs", attempt + 1, max_retries, delay
+                )
                 time.sleep(delay)
         except requests.exceptions.HTTPError as exc:
             last_exc = exc
-            if exc.response is not None and exc.response.status_code in retryable_status and attempt < max_retries - 1:
-                delay = min(base_delay * (2 ** attempt), max_delay) * random.random()
+            if (
+                exc.response is not None
+                and exc.response.status_code in retryable_status
+                and attempt < max_retries - 1
+            ):
+                delay = min(base_delay * (2**attempt), max_delay) * random.random()
                 _log.warning(
                     "HTTP %d (attempt %d/%d), retrying in %.1fs",
-                    exc.response.status_code, attempt + 1, max_retries, delay,
+                    exc.response.status_code,
+                    attempt + 1,
+                    max_retries,
+                    delay,
                 )
                 time.sleep(delay)
             else:

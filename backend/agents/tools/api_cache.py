@@ -1,4 +1,5 @@
 """Simple in-memory TTL cache for expensive API results (catalog, NDVI stats)."""
+
 import functools
 import hashlib
 import json

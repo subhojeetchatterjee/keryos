@@ -256,13 +256,10 @@ def get_best3_truecolor_auto(
     out: list[dict] = []
 
     with ThreadPoolExecutor(max_workers=fetch_workers) as pool:
-        ordered_futures = cast(  # type: ignore[assignment]
-            list[Future[dict[Any, Any] | None]],
-            [
-                pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)
-                for item in probed[:fetch_n]
-            ],
-        )
+        ordered_futures: list[Future[dict[Any, Any] | None]] = []
+        for item in probed[:fetch_n]:
+            future = pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)
+            ordered_futures.append(cast(Future[dict[Any, Any] | None], future))
         for future in ordered_futures:
             if len(out) >= 3:
                 future.cancel()

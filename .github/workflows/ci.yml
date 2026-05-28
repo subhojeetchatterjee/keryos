@@ -88,10 +88,11 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install pytest pytest-cov requests Pillow numpy reportlab sentinelhub boto3 streamlit streamlit-folium folium python-dateutil google-adk
+        run: pip install pytest pytest-cov requests Pillow numpy==1.24.0 reportlab sentinelhub boto3 streamlit==1.31.0 streamlit-folium==0.18.0 folium==0.15.1 python-dateutil google-adk litellm pydantic google-cloud-aiplatform==1.40.0 "anthropic[vertex]==0.18.0" Deprecated imageio
 
       - name: Run tests
         run: pytest tests/ --cov=agents --cov=utils --cov-report=term-missing --ignore=lib --ignore=bin --ignore=include --ignore=share
         env:
           SH_CLIENT_ID: dummy
           SH_CLIENT_SECRET: dummy
+          PYTHONPATH: ${{ github.workspace }}/backend

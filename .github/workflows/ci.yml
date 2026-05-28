@@ -88,7 +88,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install pytest pytest-cov requests Pillow numpy reportlab sentinelhub
+        run: pip install pytest pytest-cov requests Pillow numpy reportlab sentinelhub boto3 streamlit streamlit-folium folium python-dateutil
 
       - name: Run tests
         run: pytest tests/ --cov=agents --cov=utils --cov-report=term-missing --ignore=lib --ignore=bin --ignore=include --ignore=share

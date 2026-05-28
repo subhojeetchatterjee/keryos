@@ -3,7 +3,7 @@ import json
 import logging
 import math
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from agents.tools.best_images import get_best3_truecolor_auto
 from agents.tools.sentinelhub_stats import ndvi_stats_for_day, ndvi_stats_range
@@ -28,7 +28,7 @@ def _compute_pooled_stats(aggregated_stats: dict) -> dict | None:
         except (KeyError, TypeError):
             pass
         try:
-            for bk, bv in (interval.get("outputs") or {}).items():
+            for _bk, bv in (interval.get("outputs") or {}).items():
                 for _b, sv in (bv.get("bands") or {}).items():
                     stats = sv.get("stats")
                     if stats:
@@ -193,7 +193,7 @@ def get_report_bundle_for_ui(
     enable_llm = os.environ.get("ENABLE_LLM_VALIDATION", "false").lower() == "true"
     enable_narrative = os.environ.get("ENABLE_AI_NARRATIVE", "false").lower() == "true"
 
-    generated_at = datetime.now(timezone.utc).isoformat()
+    generated_at = datetime.now(UTC).isoformat()
     aoi_hash = hashlib.md5(json.dumps(aoi_geojson, sort_keys=True).encode()).hexdigest()[:8]
     _log.info(
         "Pipeline start | AOI hash=%s date=%s–%s crop=%s llm=%s narrative=%s",

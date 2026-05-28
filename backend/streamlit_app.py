@@ -5,7 +5,7 @@ import logging.config
 import os
 import time
 import traceback
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 import folium
 import streamlit as st

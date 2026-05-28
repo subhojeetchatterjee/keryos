@@ -25,7 +25,7 @@ def cloud_fraction_from_scl_png(png_bytes: bytes) -> float:
 
     cloudy = 0
     total = 0
-    for r, g, b, a in px:
+    for r, _g, _b, a in px:
         if a == 0:
             continue
         total += 1

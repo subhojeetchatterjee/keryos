@@ -1404,9 +1404,9 @@ def render_comparison_table() -> None:
 
     # Add "Reason" header
     header_html += (
-        f'<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);'
-        f'font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;'
-        f'background:var(--bg-2);">Decision</th>'
+        '<th style="padding:0.4rem 0.6rem;text-align:left;color:var(--text-2);'
+        'font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;'
+        'background:var(--bg-2);">Decision</th>'
     )
 
     st.markdown(

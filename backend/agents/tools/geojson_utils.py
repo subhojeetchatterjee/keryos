@@ -64,7 +64,7 @@ def estimate_area_km2(geom: dict) -> float:
         return 0.0
 
     lats = [c[1] for c in coords]
-    lons = [c[0] for c in coords]
+    [c[0] for c in coords]
     center_lat = (min(lats) + max(lats)) / 2.0
 
     area_deg2 = _shoelace_area_deg2(coords)

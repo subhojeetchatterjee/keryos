@@ -1,7 +1,7 @@
 import asyncio
 import base64
 import json
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
@@ -9,7 +9,7 @@ from google.adk.events import Event
 from google.adk.events.event_actions import EventActions
 
 from agents.tools.sentinel_hub import scene_search_s2_l2a
-from agents.tools.sentinelhub_process import process_png_truecolor, process_png_ndvi
+from agents.tools.sentinelhub_process import process_png_ndvi, process_png_truecolor
 
 
 class GeoDataDeterministicAgent(BaseAgent):

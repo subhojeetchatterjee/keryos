@@ -18,7 +18,7 @@ def require_env(key: str) -> str:
     value = os.environ.get(key)
     if not value:
         desc = _DESCRIPTIONS.get(key, "no description available")
-        raise EnvironmentError(
+        raise OSError(
             f"Required environment variable {key!r} is not set. "
             f"Purpose: {desc}. "
             "Set it before starting the application."
@@ -30,7 +30,7 @@ def check_sentinel_credentials() -> None:
     """Raise EnvironmentError if both Sentinel Hub credentials are absent."""
     missing = [k for k in ("SH_CLIENT_ID", "SH_CLIENT_SECRET") if not os.environ.get(k)]
     if missing:
-        raise EnvironmentError(
+        raise OSError(
             f"Missing Sentinel Hub credentials: {', '.join(missing)}. "
             "Set SH_CLIENT_ID and SH_CLIENT_SECRET as environment variables."
         )

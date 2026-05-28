@@ -2,18 +2,20 @@ import json
 import logging
 import os
 import time
-import requests
 from datetime import datetime, timedelta
 
-_log = logging.getLogger(__name__)
+import requests
 from sentinelhub import (
-    SHConfig,
-    SentinelHubCatalog,
-    DataCollection,
     CRS,
     BBox,
+    DataCollection,
+    SentinelHubCatalog,
+    SHConfig,
 )
+
 from agents.tools.geojson_utils import extract_geometry
+
+_log = logging.getLogger(__name__)
 
 
 def sh_request_with_retry(method: str, url: str, max_retries: int = 3, **kwargs):

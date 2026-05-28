@@ -1,9 +1,9 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
+
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from google.adk.events.event_actions import EventActions
-
 
 
 def _get_user_text(ctx: InvocationContext) -> str:
@@ -21,8 +21,8 @@ class IntakeDeterministicAgent(BaseAgent):
     description: str = "Deterministically builds analysis_spec JSON without calling an LLM."
 
     async def _run_async_impl(self, context: InvocationContext) -> AsyncGenerator[Event, None]:
-        user_text = _get_user_text(context)
-        
+        _get_user_text(context)
+
         # Default AOI and values (formerly in eo_mock)
         default_aoi = {
             "type": "Polygon",

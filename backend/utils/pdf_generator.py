@@ -8,12 +8,11 @@ from datetime import datetime
 from reportlab.lib import colors
 from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import A4, letter
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import (
     HRFlowable,
     Image,
-    KeepTogether,
     PageBreak,
     Paragraph,
     SimpleDocTemplate,
@@ -361,7 +360,7 @@ def _ndvi_spectrum_bar(mean_ndvi: float, width: float = _CW) -> list:
 
     # Row 1: colour cells with marker in active band
     bar_row = []
-    for i, (_, _, color, _) in enumerate(_NDVI_BANDS):
+    for i, (_, _, _color, _) in enumerate(_NDVI_BANDS):
         txt = "▼" if i == active else ""
         bar_row.append(Paragraph(txt, ParagraphStyle(
             f"bm{i}", fontName="Helvetica-Bold", fontSize=8,
@@ -1093,7 +1092,7 @@ def generate_summary_pdf(report: dict) -> bytes:
             health_class, (_GRAY_L, _NAVY, "ASSESSMENT", "")
         )
         verdict_tbl = Table([[
-            [Paragraph(f'<b>VERDICT</b>', ParagraphStyle(
+            [Paragraph('<b>VERDICT</b>', ParagraphStyle(
                 "vl", fontName="Helvetica-Bold", fontSize=7,
                 textColor=fg, spaceAfter=2,
             )),
@@ -1261,7 +1260,6 @@ def generate_appendix_pdf(report: dict) -> bytes:
         CONFIDENCE_METHODOLOGY,
         DESIGN_DECISIONS,
         EVALUATION_FRAMEWORK,
-        RESEARCH_QUESTIONS,
         FUTURE_WORK,
         NDVI_THEORY,
         PIPELINE_DIAGRAM,
@@ -1271,6 +1269,7 @@ def generate_appendix_pdf(report: dict) -> bytes:
         QUALITY_SCORING_METHODOLOGY,
         REFERENCES,
         REMOTE_SENSING_LIMITATIONS,
+        RESEARCH_QUESTIONS,
         SCORING_WEIGHTS,
         SENTINEL2_BANDS,
         SENTINEL2_RATIONALE,

@@ -1,5 +1,5 @@
 import json
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from google.adk.agents import BaseAgent
 from google.adk.agents.invocation_context import InvocationContext
@@ -17,7 +17,7 @@ class AnalyticsDeterministicAgent(BaseAgent):
         state = context.session.state
         analysis_spec_raw = state.get("analysis_spec")
         # geodata_result is used for metadata/notes in real flow
-        geodata_result_raw = state.get("geodata_result")
+        state.get("geodata_result")
 
         if not analysis_spec_raw:
             err = json.dumps({"error": "Missing analysis_spec in state."})
@@ -37,11 +37,11 @@ class AnalyticsDeterministicAgent(BaseAgent):
         try:
             # REAL calculation instead of mock_compute_timeseries
             stats = ndvi_stats_range(aoi, d_start, d_end)
-            
+
             # Extract relevant stats for the report agent
             # Note: Statistics API response is nested
-            data_points = stats.get("data", [])
-            
+            stats.get("data", [])
+
             # Simple aggregation for the narrative agent
             metrics = {
                 "source": "Sentinel Hub Statistics API",

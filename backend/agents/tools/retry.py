@@ -3,7 +3,7 @@ import logging
 import random
 import time
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import TypeVar
 
 import requests
 

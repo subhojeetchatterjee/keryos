@@ -49,7 +49,7 @@ def get_token(max_retries: int = 3) -> str:
         j = r.json()
         _CACHE["token"] = j["access_token"]
         _CACHE["exp"] = now + int(j.get("expires_in", 600))
-        _log.debug("Acquired new Sentinel Hub token (expires in %ss)", j.get("expires_in", 600))
+        _log.debug(f"Acquired new Sentinel Hub token (expires in {j.get('expires_in', 600)}s)")
         return str(_CACHE["token"])
     except requests.exceptions.Timeout as err:
         raise RuntimeError(
@@ -57,4 +57,4 @@ def get_token(max_retries: int = 3) -> str:
             "Check your internet connection or try again in a moment."
         ) from err
     except requests.exceptions.RequestException as exc:
-        raise RuntimeError("Sentinel Hub authentication failed: %s" % exc) from exc
+        raise RuntimeError(f"Sentinel Hub authentication failed: {exc}") from exc

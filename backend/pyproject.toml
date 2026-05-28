@@ -1,0 +1,48 @@
+[project]
+name = "keryos"
+version = "0.1.0"
+description = "Automated prevented-sowing claim verification using Sentinel-2 and Google Cloud Vertex AI"
+requires-python = ">=3.11"
+dependencies = [
+    "google-adk",
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "python-dateutil",
+    "greenlet",
+    "aiosqlite",
+    "litellm",
+    "sentinelhub",
+    "requests",
+    "numpy==1.24.0",
+    "Pillow==10.2.0",
+"imageio",
+    "streamlit==1.31.0",
+    "streamlit-folium==0.18.0",
+    "folium==0.15.1",
+    "reportlab==4.0.9",
+    "Deprecated",
+]
+
+[project.optional-dependencies]
+dev = ["ruff", "mypy", "pytest", "pytest-cov", "types-requests", "types-Pillow"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+select = ["E", "F", "W", "I", "UP", "B", "C4"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_ignores = true
+no_implicit_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--tb=short -q --ignore=lib --ignore=bin --ignore=include --ignore=share"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

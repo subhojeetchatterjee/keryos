@@ -1,0 +1,35 @@
+# Virtual environment
+backend/bin/
+backend/lib/
+backend/include/
+backend/share/
+backend/pyvenv.cfg
+backend/.env
+backend/.adk/
+
+# IDE and OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# Project-specific
+*.pdf
+CLAUDE.md
+skills-lock.json
+.claude/
+.agents/

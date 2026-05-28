@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dev dependencies
+        run: pip install ruff mypy types-requests types-Pillow
+
+      - name: Ruff lint
+        run: ruff check agents/ utils/ streamlit_app.py
+
+      - name: Ruff format check
+        run: ruff format --check agents/ utils/ streamlit_app.py
+
+      - name: mypy type check
+        run: mypy agents/tools/ utils/ streamlit_app.py --ignore-missing-imports
+
+  syntax-check:
+    name: Syntax Check (py_compile)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install minimal deps for import resolution
+        run: pip install requests Pillow numpy reportlab boto3 sentinelhub streamlit streamlit-folium folium python-dateutil
+
+      - name: py_compile all modules
+        run: |
+          python -m py_compile \
+            agents/tools/retry.py \
+            agents/tools/api_cache.py \
+            agents/tools/env_config.py \
+            agents/tools/stats_utils.py \
+            agents/tools/geojson_utils.py \
+            agents/tools/cdse_auth.py \
+            agents/tools/sentinelhub_catalog.py \
+            agents/tools/sentinelhub_process.py \
+            agents/tools/sentinelhub_stats.py \
+            agents/tools/best_images.py \
+            agents/tools/report_bundle.py \
+            utils/messages.py \
+            utils/pdf_generator.py \
+            streamlit_app.py
+
+  tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install pytest pytest-cov requests Pillow numpy reportlab sentinelhub
+
+      - name: Run tests
+        run: pytest tests/ --cov=agents --cov=utils --cov-report=term-missing --ignore=lib --ignore=bin --ignore=include --ignore=share
+        env:
+          SH_CLIENT_ID: dummy
+          SH_CLIENT_SECRET: dummy

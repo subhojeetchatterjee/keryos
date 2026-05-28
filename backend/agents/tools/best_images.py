@@ -256,7 +256,7 @@ def get_best3_truecolor_auto(
     out: list[dict] = []
 
     with ThreadPoolExecutor(max_workers=fetch_workers) as pool:
-        ordered_futures = cast(
+        ordered_futures = cast(  # type: ignore[assignment]
             list[Future[dict[Any, Any] | None]],
             [
                 pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)

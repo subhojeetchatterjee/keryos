@@ -983,6 +983,8 @@ def render_methodology_tab() -> None:
 
 
 def _render_band_table() -> None:
+    from typing import Any, cast
+
     from utils.academic_content import SENTINEL2_BANDS
 
     st.markdown(
@@ -992,11 +994,11 @@ def _render_band_table() -> None:
     rows = "".join(
         f"<tr>"
         f"<td style=\"font-family:'JetBrains Mono',monospace;color:#38bdf8;\">{band}</td>"
-        f'<td style="color:var(--text-2);">{info["name"]}</td>'
+        f'<td style="color:var(--text-2);">{cast(dict[str, Any], info)["name"]}</td>'
         f"<td style=\"font-family:'JetBrains Mono',monospace;color:var(--text-1);\">"
-        f"{info['wavelength_nm']} nm</td>"
+        f"{cast(dict[str, Any], info)['wavelength_nm']} nm</td>"
         f"<td style=\"font-family:'JetBrains Mono',monospace;color:#00d68f;\">"
-        f"{info['resolution_m']} m</td>"
+        f"{cast(dict[str, Any], info)['resolution_m']} m</td>"
         f"</tr>"
         for band, info in SENTINEL2_BANDS.items()
     )

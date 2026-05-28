@@ -47,7 +47,7 @@ def ttl_cached(ttl_seconds: int = 300) -> Callable[[Callable[..., T]], Callable[
             hit, value = cache.get(key)
             if hit:
                 _log.debug("Cache hit: %s", fn.__qualname__)
-                return value  # type: ignore[return-value]
+                return cast(T, value)
             result = fn(*args, **kwargs)
             cache.set(key, result)
             return result

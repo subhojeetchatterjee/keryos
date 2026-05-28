@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import re
+from typing import Any, cast
 
 import anthropic
 
@@ -141,17 +142,17 @@ _OUTPUT_SCHEMA = """\
 """
 
 
-def _parse_response(text: str) -> dict | None:
+def _parse_response(text: str) -> dict[Any, Any] | None:
     """Attempt to extract a JSON object from raw model text."""
     text = text.strip()
     try:
-        return json.loads(text)
+        return cast(dict[Any, Any], json.loads(text))
     except json.JSONDecodeError:
         pass
     match = re.search(r"\{[\s\S]*\}", text)
     if match:
         try:
-            return json.loads(match.group())
+            return cast(dict[Any, Any], json.loads(match.group()))
         except json.JSONDecodeError:
             pass
     return None

@@ -4,6 +4,7 @@ import logging
 import math
 import os
 from datetime import UTC, datetime
+from typing import Any, cast
 
 from agents.tools.best_images import get_best3_truecolor_auto
 from agents.tools.sentinelhub_stats import ndvi_stats_for_day, ndvi_stats_range
@@ -17,16 +18,17 @@ _KERYOS_VERSION = "0.1"
 # ── Internal helpers ───────────────────────────────────────────────────────────
 
 
-def _compute_pooled_stats(aggregated_stats: dict) -> dict | None:
+def _compute_pooled_stats(aggregated_stats: dict) -> dict[Any, Any] | None:
     """
     Weighted mean and pooled stDev across all valid daily intervals.
     Skips intervals where mean is NaN, None, or sampleCount == 0.
     Returns {"mean", "stDev", "passes", "totalPixels"} or None.
     """
 
-    def _extract(interval: dict) -> dict | None:
+    def _extract(interval: dict) -> dict[Any, Any] | None:
         try:
-            return interval["outputs"]["data"]["bands"]["B0"]["stats"]
+            result = interval["outputs"]["data"]["bands"]["B0"]["stats"]
+            return cast(dict[Any, Any], result)
         except (KeyError, TypeError):
             pass
         try:
@@ -34,7 +36,7 @@ def _compute_pooled_stats(aggregated_stats: dict) -> dict | None:
                 for _b, sv in (bv.get("bands") or {}).items():
                     stats = sv.get("stats")
                     if stats:
-                        return stats
+                        return cast(dict[Any, Any], stats)
         except Exception:
             pass
         return None

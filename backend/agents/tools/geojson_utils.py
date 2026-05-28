@@ -1,7 +1,8 @@
 import math
+from typing import Any, cast
 
 
-def extract_geometry(aoi_geojson: dict) -> dict:
+def extract_geometry(aoi_geojson: dict) -> dict[Any, Any]:
     """
     Normalize any GeoJSON input to a raw Geometry object.
     Handles: Geometry | Feature | FeatureCollection.
@@ -19,13 +20,13 @@ def extract_geometry(aoi_geojson: dict) -> dict:
         geom = features[0].get("geometry")
         if not geom:
             raise ValueError("FeatureCollection first feature has no geometry.")
-        return geom
+        return cast(dict[Any, Any], geom)
 
     elif geo_type == "Feature":
         geom = aoi_geojson.get("geometry")
         if not geom:
             raise ValueError("Feature has no geometry.")
-        return geom
+        return cast(dict[Any, Any], geom)
 
     elif geo_type in ("Polygon", "MultiPolygon"):
         return aoi_geojson

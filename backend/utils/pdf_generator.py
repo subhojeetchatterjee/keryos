@@ -4,6 +4,7 @@ import io
 import json
 import logging
 from datetime import datetime
+from typing import Any, cast
 
 from reportlab.lib import colors
 from reportlab.lib.colors import HexColor
@@ -1704,12 +1705,13 @@ def generate_appendix_pdf(report: dict) -> bytes:
         "SCL": "Cloud masking (per-pixel classification)",
     }
     for band, info in SENTINEL2_BANDS.items():
+        info_dict = cast(dict[str, Any], info)
         band_rows.append(
             [
                 band,
-                info["name"],
-                str(info["wavelength_nm"]) if info["wavelength_nm"] else "—",
-                str(info["resolution_m"]),
+                info_dict["name"],
+                str(info_dict["wavelength_nm"]) if info_dict["wavelength_nm"] else "—",
+                str(info_dict["resolution_m"]),
                 usage_map.get(band, ""),
             ]
         )

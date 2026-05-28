@@ -16,7 +16,7 @@ def get_token(max_retries: int = 3) -> str:
     now = int(time.time())
     cached_token = _CACHE.get("token")
     cached_exp = _CACHE.get("exp", 0)
-    if cached_token and now < int(cached_exp) - 30:
+    if cached_token and now < int(float(cached_exp)) - 30:
         return str(cached_token)
 
     client_id = os.environ.get("SH_CLIENT_ID", "")

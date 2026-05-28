@@ -259,9 +259,7 @@ def get_best3_truecolor_auto(
         ordered_futures = cast(
             list[Future[dict[Any, Any] | None]],
             [
-                pool.submit(
-                    _fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator
-                )
+                pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)
                 for item in probed[:fetch_n]
             ],
         )

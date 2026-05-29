@@ -271,11 +271,13 @@ def get_report_bundle_for_ui(
             from agents.tools.llm_narrative import generate_claim_narrative
 
             stats_data = safe_extract_stats(stats) or {}
+            extra_imgs = [img["png_b64"] for img in images[1:] if img.get("png_b64")]
             ai_assessment = generate_claim_narrative(
                 best["png_b64"],
                 stats_data,
                 best["date"],
                 best["cloud_score"],
+                extra_images_b64=extra_imgs,
                 pooled_stats=pooled_stats,
                 ndvi_interpretation=ndvi_interp,
                 confidence=confidence,

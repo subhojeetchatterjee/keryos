@@ -232,6 +232,7 @@ def generate_claim_narrative(
     best_date: str,
     cloud_score: float,
     *,
+    extra_images_b64: list[str] | None = None,
     pooled_stats: dict | None = None,
     ndvi_interpretation: dict | None = None,
     confidence: dict | None = None,
@@ -273,8 +274,21 @@ def generate_claim_narrative(
         ai_validated=ai_validated,
     )
 
+    all_images = [image_b64] if image_b64 else []
+    for img in (extra_images_b64 or []):
+        if img and img not in all_images:
+            all_images.append(img)
+
+    n_images = len(all_images)
+    image_note = (
+        f"You are provided with {n_images} cloud-free Sentinel-2 true-colour scenes "
+        f"(ranked best-first by composite quality score). Use all images together for a "
+        f"richer visual assessment — cross-reference spectral patterns across scenes.\n\n"
+        if n_images > 1 else ""
+    )
+
     prompt = (
-        f"{evidence_block}\n\n"
+        f"{image_note}{evidence_block}\n\n"
         "Based solely on the evidence pack above, produce your analysis.\n"
         "Quote specific numerical values from the evidence pack in every section that discusses metrics.\n"
         "Do not introduce any information not present in the evidence pack.\n\n"
@@ -294,8 +308,8 @@ def generate_claim_narrative(
     ]
 
     parts: list[Any] = []
-    if image_b64:
-        parts.append({"inline_data": {"mime_type": "image/png", "data": image_b64}})
+    for img_b64 in all_images:
+        parts.append({"inline_data": {"mime_type": "image/png", "data": img_b64}})
     parts.append({"text": _ANALYST_SYSTEM + "\n\n" + prompt})
 
     payload = {

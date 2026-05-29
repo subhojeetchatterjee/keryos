@@ -282,7 +282,16 @@ def generate_claim_narrative(
     )
 
     api_key = os.environ.get("GEMINI_API_KEY", "")
-    url = _GEMINI_URL.format(model=_narrative_model())
+
+    # Fallback chain — tries each model in order on 429/503
+    override = os.environ.get("GEMINI_NARRATIVE_MODEL_ID")
+    models = [override] if override else [
+        "gemini-3.1-flash-lite",   # 500 RPD — most headroom
+        "gemini-3.5-flash",        # 20 RPD
+        "gemini-2.5-flash",        # 20 RPD
+        "gemini-3-flash",          # 20 RPD
+        "gemini-2.5-flash-lite",   # 20 RPD — last resort
+    ]
 
     parts: list[Any] = []
     if image_b64:
@@ -296,13 +305,12 @@ def generate_claim_narrative(
 
     try:
         r = None
-        for attempt in range(3):
+        for model in models:
+            url = _GEMINI_URL.format(model=model)
             r = requests.post(url, params={"key": api_key}, json=payload, timeout=120)
             if r.status_code not in (429, 503):
                 break
-            wait = 15 * (attempt + 1)
-            _log.warning("Gemini narrative %d, retrying in %ds", r.status_code, wait)
-            time.sleep(wait)
+            _log.warning("Gemini narrative %d on %s, trying next model", r.status_code, model)
         r.raise_for_status()
         raw = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
         _log.debug("AI narrative response: %d chars", len(raw))

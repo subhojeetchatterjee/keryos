@@ -1,9 +1,11 @@
+import base64
 import json
 import logging
 import os
 import re
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 _log = logging.getLogger(__name__)
 
@@ -45,14 +47,12 @@ Respond ONLY with valid JSON:
 """
 
 
-def _get_model() -> genai.GenerativeModel:
-    api_key = os.environ.get("GEMINI_API_KEY", "")
-    genai.configure(api_key=api_key)
-    model_id = os.environ.get("GEMINI_VALIDATOR_MODEL_ID", "gemini-1.5-flash")
-    return genai.GenerativeModel(
-        model_name=model_id,
-        system_instruction=_VALIDATOR_SYSTEM,
-    )
+def _client() -> genai.Client:
+    return genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
+
+
+def _validator_model() -> str:
+    return os.environ.get("GEMINI_VALIDATOR_MODEL_ID", "gemini-2.0-flash")
 
 
 def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
@@ -66,14 +66,18 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
       observed_features  — str: description of what is visually present in the image
       cloud_fraction_visual — float|None: estimated visual cloud fraction
     """
-    import base64
-
     try:
-        model = _get_model()
-        image_part = {"mime_type": "image/png", "data": base64.b64decode(image_b64)}
-        response = model.generate_content(
-            [image_part, _VALIDATOR_PROMPT],
-            generation_config={"max_output_tokens": 300, "temperature": 0.1},
+        image_bytes = base64.b64decode(image_b64)
+        response = _client().models.generate_content(
+            model=_validator_model(),
+            contents=[
+                types.Part.from_bytes(data=image_bytes, mime_type="image/png"),
+                _VALIDATOR_SYSTEM + "\n\n" + _VALIDATOR_PROMPT,
+            ],
+            config=types.GenerateContentConfig(
+                max_output_tokens=300,
+                temperature=0.1,
+            ),
         )
         text = response.text.strip()
         _log.debug("Gemini validator response for %s: %s", date, text[:120])

@@ -5,7 +5,8 @@ import os
 import re
 from typing import Any, cast
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 _log = logging.getLogger(__name__)
 
@@ -26,10 +27,12 @@ NON-NEGOTIABLE RULES:
 """
 
 
-def _get_narrative_model() -> genai.GenerativeModel:
-    genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
-    model_id = os.environ.get("GEMINI_NARRATIVE_MODEL_ID", "gemini-1.5-pro")
-    return genai.GenerativeModel(model_name=model_id, system_instruction=_ANALYST_SYSTEM)
+def _client() -> genai.Client:
+    return genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
+
+
+def _narrative_model() -> str:
+    return os.environ.get("GEMINI_NARRATIVE_MODEL_ID", "gemini-2.0-flash")
 
 
 def _fmt(v: object, decimals: int = 3) -> str:
@@ -278,15 +281,16 @@ def generate_claim_narrative(
         f"Respond ONLY with valid JSON matching this exact schema:\n{_OUTPUT_SCHEMA}"
     )
 
-    parts: list[Any] = []
+    contents: list[Any] = []
     if image_b64:
-        parts.append({"mime_type": "image/png", "data": base64.b64decode(image_b64)})
-    parts.append(prompt)
+        contents.append(types.Part.from_bytes(data=base64.b64decode(image_b64), mime_type="image/png"))
+    contents.append(_ANALYST_SYSTEM + "\n\n" + prompt)
 
     try:
-        response = _get_narrative_model().generate_content(
-            parts,
-            generation_config={"max_output_tokens": 800, "temperature": 0.2},
+        response = _client().models.generate_content(
+            model=_narrative_model(),
+            contents=contents,
+            config=types.GenerateContentConfig(max_output_tokens=800, temperature=0.2),
         )
         raw = response.text.strip()
         _log.debug("AI narrative response: %d chars", len(raw))

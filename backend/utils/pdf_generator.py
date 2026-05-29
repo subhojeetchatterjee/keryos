@@ -1232,7 +1232,7 @@ def generate_verification_pdf(report: dict, polygon_coords: dict | None) -> byte
             f"{confidence.get('temporal_coverage', 0):.0%}  ({confidence.get('passes', 0)} passes)",
             "35% — multi-pass composite reliability",
         ],
-        ["AI Image Validation", ai_val_str, "10% — Claude 3 Haiku automated quality assessment"],
+        ["AI Image Validation", ai_val_str, "10% — Gemini automated quality assessment"],
         ["AI Validation Confidence", ai_conf_str, "Sub-score from AI validator"],
         ["Overall", f"{conf_label}  ({overall:.0%})", "Composite score"],
     ]

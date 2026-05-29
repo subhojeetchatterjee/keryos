@@ -3,7 +3,7 @@ import logging
 import os
 import re
 
-import anthropic
+import google.generativeai as genai
 
 _log = logging.getLogger(__name__)
 
@@ -45,20 +45,19 @@ Respond ONLY with valid JSON:
 """
 
 
-def _vertex_client() -> anthropic.AnthropicVertex:
-    return anthropic.AnthropicVertex(
-        region=os.environ.get("CLOUD_ML_REGION", "us-east5"),
-        project_id=os.environ.get("ANTHROPIC_VERTEX_PROJECT_ID", ""),
+def _get_model() -> genai.GenerativeModel:
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    genai.configure(api_key=api_key)
+    model_id = os.environ.get("GEMINI_VALIDATOR_MODEL_ID", "gemini-1.5-flash")
+    return genai.GenerativeModel(
+        model_name=model_id,
+        system_instruction=_VALIDATOR_SYSTEM,
     )
-
-
-def _validator_model() -> str:
-    return os.environ.get("VERTEX_VALIDATOR_MODEL_ID", "claude-3-haiku@20240307")
 
 
 def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
     """
-    Validate a Sentinel-2 image for insurance-grade crop analysis.
+    Validate a Sentinel-2 image for insurance-grade crop analysis using Gemini.
 
     Returns:
       is_valid           — bool: image is usable for spectral analysis
@@ -67,26 +66,17 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
       observed_features  — str: description of what is visually present in the image
       cloud_fraction_visual — float|None: estimated visual cloud fraction
     """
+    import base64
+
     try:
-        response = _vertex_client().messages.create(
-            model=_validator_model(),
-            max_tokens=250,
-            system=_VALIDATOR_SYSTEM,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {"type": "base64", "media_type": "image/png", "data": image_b64},
-                        },
-                        {"type": "text", "text": _VALIDATOR_PROMPT},
-                    ],
-                }
-            ],
+        model = _get_model()
+        image_part = {"mime_type": "image/png", "data": base64.b64decode(image_b64)}
+        response = model.generate_content(
+            [image_part, _VALIDATOR_PROMPT],
+            generation_config={"max_output_tokens": 300, "temperature": 0.1},
         )
-        text = response.content[0].text.strip()
-        _log.debug("Validator raw response for %s: %s", date, text[:120])
+        text = response.text.strip()
+        _log.debug("Gemini validator response for %s: %s", date, text[:120])
 
         match = re.search(r"\{[\s\S]*\}", text)
         if match:
@@ -98,7 +88,7 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
             result.setdefault("cloud_fraction_visual", None)
             return result
 
-        _log.warning("Validator response for %s could not be parsed as JSON", date)
+        _log.warning("Gemini validator response for %s could not be parsed as JSON", date)
         return {
             "is_valid": True,
             "reason": "Could not parse validator response — defaulting to valid",
@@ -108,7 +98,7 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
         }
 
     except Exception as exc:
-        _log.warning("Vertex AI validation error for %s: %s", date, exc)
+        _log.warning("Gemini validation error for %s: %s", date, exc)
         return {
             "is_valid": True,
             "reason": f"Validation service unavailable ({exc}) — image accepted by default",

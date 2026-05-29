@@ -129,7 +129,7 @@ def main() -> None:
         enable_llm = st.checkbox(
             "AI Image Validation",
             value=False,
-            help="Uses Claude 3 Haiku via Vertex AI to validate image quality",
+            help="Uses Gemini via Vertex AI to validate image quality",
         )
         enable_narrative = st.checkbox(
             "AI Narrative",
@@ -141,7 +141,7 @@ def main() -> None:
         os.environ["ENABLE_AI_NARRATIVE"] = "true" if enable_narrative else "false"
 
         if enable_llm or enable_narrative:
-            st.info("Requires ANTHROPIC_VERTEX_PROJECT_ID and CLOUD_ML_REGION.")
+            st.info("Requires GEMINI_API_KEY environment variable.")
 
         st.markdown('<hr style="border-color:rgba(0,214,143,0.09);margin:1rem 0;">', unsafe_allow_html=True)
         render_faq()

@@ -444,7 +444,7 @@ def render_best_scene(report: dict) -> None:
         st.image(
             img_data,
             caption=f"True Colour RGB · {report['best_date']} · © Copernicus Sentinel-2",
-            use_container_width=True,
+            use_column_width=True,
         )
     with col2:
         st.markdown('<p class="k-head">Scene Metrics</p>', unsafe_allow_html=True)
@@ -452,7 +452,7 @@ def render_best_scene(report: dict) -> None:
         cloud_score = report["best_image"]["cloud_score"]
         cloud_cover = report["best_image"].get("cloud_cover")
         st.metric("Cloud Score", f"{cloud_score:.1%}")
-        st.metric("Cloud Coverage", f"{cloud_cover:.1%}" if cloud_cover is not None else "—")
+        st.metric("Cloud Coverage", f"{cloud_cover:.1f}%" if cloud_cover is not None else "—")
 
         llm_val = report["best_image"].get("llm_validation")
         if llm_val:
@@ -468,7 +468,7 @@ def render_best_scene(report: dict) -> None:
                     f'box-shadow:0 0 5px #00d68f;display:inline-block;flex-shrink:0;"></span>'
                     f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.72rem;"
                     f'color:#00d68f;">AI Validated</span>'
-                    f'<span class="ai-badge">Claude 3 Haiku</span></div>'
+                    f'<span class="ai-badge">Gemini</span></div>'
                     f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.77rem;"
                     f'color:#94a3b8;">Confidence&nbsp;<strong style="color:#00d68f;">'
                     f"{conf:.0%}</strong></span>"
@@ -690,7 +690,7 @@ def render_alternatives(report: dict) -> None:
                 st.image(
                     alt_img,
                     caption=f"Scene {idx} · {alt['date']} · © Copernicus Sentinel-2",
-                    use_container_width=True,
+                    use_column_width=True,
                 )
             with col2:
                 st.metric("Date", alt["date"])
@@ -912,7 +912,7 @@ increases the chance of finding a cloud-free scene, but use at most the actual
 sowing season (typically 30–90 days) for accurate results.
 
 **What are the AI features?**
-*AI Image Validation* uses Claude 3 Haiku to check that the satellite image is
+*AI Image Validation* uses Gemini to check that the satellite image is
 usable (not mostly cloud or black). *AI Narrative* uses Claude 3.5 Sonnet to
 generate a professional 2–3 sentence assessment. Both require GCP Vertex AI
 credentials and are disabled by default.
@@ -1294,7 +1294,7 @@ def render_visual_pipeline() -> None:
                 "Image quality analysis (8 metrics)",
                 "Composite scoring (cloud 40% + contrast 25% + brightness 15% + veg 20%)",
                 "Hard-reject filter",
-                "[Optional] Claude 3 Haiku validation",
+                "[Optional] Gemini validation",
                 "Fetch 512×512 SWIR PNG",
             ],
             "params": "full_px=512 · 4 workers · top 6 probed",

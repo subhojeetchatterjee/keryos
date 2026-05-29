@@ -188,7 +188,7 @@ User Input
 │     score = 0.40×cloud_clarity + 0.25×contrast  │
 │           + 0.15×brightness + 0.20×vegetation    │
 │  ⑤ Hard-reject check (cloud, dark, sat, nodata) │
-│  ⑥ [Optional] Claude 3 Haiku image validation   │
+│  ⑥ [Optional] Gemini image validation   │
 │  ⑦ Fetch 512×512 px SWIR false-colour PNG        │
 │                                                  │
 │  Output: ≤3 scenes ranked by composite_score    │
@@ -269,7 +269,7 @@ and enables components to be replaced or extended independently.
 **Intelligence Layer:**
 - `agents/tools/image_score.py` — SCL cloud scoring and full image quality analysis
 - `agents/tools/best_images.py` — two-phase parallel scene selection pipeline
-- `agents/tools/image_validator_llm.py` — Claude 3 Haiku image quality validation
+- `agents/tools/image_validator_llm.py` — Gemini image quality validation
 - `agents/tools/llm_narrative.py` — Claude 3.5 Sonnet evidence-grounded narrative
 - `agents/tools/report_bundle.py` — deterministic NDVI interpretation and confidence scoring
 
@@ -295,7 +295,7 @@ from three factors:
 |---|---|---|
 | Cloud scene clarity  (1 − cloud_score) | 55% | SCL-derived cloud fraction |
 | Temporal coverage (passes / 5, capped at 1.0) | 35% | Number of valid NDVI passes |
-| AI image validation | 10% | Claude 3 Haiku assessment (if enabled) |
+| AI image validation | 10% | Gemini assessment (if enabled) |
 
 If AI validation is not enabled, the remaining 10% weight is redistributed
 (overall = cloud × 0.55 + temporal × 0.35, normalised).
@@ -409,7 +409,7 @@ outputs should be interpreted:**
   fails validation.  However, subtle hallucinations (e.g., slightly incorrect
   metric values) cannot be fully excluded without manual verification.
 
-**Claude 3 Haiku (image validation):**
+**Gemini (image validation):**
 - The model assesses broad image usability (is the image valid for analysis?),
   not fine-grained vegetation characteristics.
 - It may occasionally flag valid scenes as invalid (false negatives) if the

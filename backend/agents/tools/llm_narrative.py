@@ -1,10 +1,11 @@
+import base64
 import json
 import logging
 import os
 import re
 from typing import Any, cast
 
-import anthropic
+import google.generativeai as genai
 
 _log = logging.getLogger(__name__)
 
@@ -25,15 +26,10 @@ NON-NEGOTIABLE RULES:
 """
 
 
-def _vertex_client() -> anthropic.AnthropicVertex:
-    return anthropic.AnthropicVertex(
-        region=os.environ.get("CLOUD_ML_REGION", "us-east5"),
-        project_id=os.environ.get("ANTHROPIC_VERTEX_PROJECT_ID", ""),
-    )
-
-
-def _narrative_model() -> str:
-    return os.environ.get("VERTEX_NARRATIVE_MODEL_ID", "claude-3-5-sonnet@20241022")
+def _get_narrative_model() -> genai.GenerativeModel:
+    genai.configure(api_key=os.environ.get("GEMINI_API_KEY", ""))
+    model_id = os.environ.get("GEMINI_NARRATIVE_MODEL_ID", "gemini-1.5-pro")
+    return genai.GenerativeModel(model_name=model_id, system_instruction=_ANALYST_SYSTEM)
 
 
 def _fmt(v: object, decimals: int = 3) -> str:
@@ -69,7 +65,7 @@ def _build_evidence_block(
     dates_str = ", ".join(acquisition_dates) if acquisition_dates else best_date
 
     ai_val_str = (
-        "Validated (Claude 3 Haiku)"
+        "Validated (Gemini)"
         if ai_validated is True
         else "Flagged by AI validator"
         if ai_validated is False
@@ -282,24 +278,17 @@ def generate_claim_narrative(
         f"Respond ONLY with valid JSON matching this exact schema:\n{_OUTPUT_SCHEMA}"
     )
 
-    content: list[dict] = []
+    parts: list[Any] = []
     if image_b64:
-        content.append(
-            {
-                "type": "image",
-                "source": {"type": "base64", "media_type": "image/png", "data": image_b64},
-            }
-        )
-    content.append({"type": "text", "text": prompt})
+        parts.append({"mime_type": "image/png", "data": base64.b64decode(image_b64)})
+    parts.append(prompt)
 
     try:
-        response = _vertex_client().messages.create(
-            model=_narrative_model(),
-            max_tokens=800,
-            system=_ANALYST_SYSTEM,
-            messages=[{"role": "user", "content": content}],
+        response = _get_narrative_model().generate_content(
+            parts,
+            generation_config={"max_output_tokens": 800, "temperature": 0.2},
         )
-        raw = response.content[0].text.strip()
+        raw = response.text.strip()
         _log.debug("AI narrative response: %d chars", len(raw))
 
         parsed = _parse_response(raw)

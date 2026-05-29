@@ -593,9 +593,7 @@ def _ai_section_blocks(ai_assessment: dict, ai_narrative: str, st: dict) -> list
     is_struct = bool(ai_assessment) and isinstance(ai_assessment, dict)
     is_fallback = ai_assessment.get("fallback", True) if is_struct else True
     model_txt = (
-        "Deterministic baseline  (AI narrative not enabled)"
-        if is_fallback
-        else "Gemini  ·  Google AI Studio"
+        "Deterministic baseline  (AI narrative not enabled)" if is_fallback else "Gemini  ·  Google AI Studio"
     )
 
     exec_sum = (ai_assessment.get("executive_summary") if is_struct else None) or ai_narrative

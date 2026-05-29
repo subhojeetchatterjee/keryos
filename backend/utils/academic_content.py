@@ -224,7 +224,7 @@ User Input
                       ▼
 ┌──────────────────────────────────────────────────┐
 │  [OPTIONAL] AI REASONING  (feature-flagged)      │
-│  Claude 3.5 Sonnet via Google Cloud Vertex AI    │
+│  Gemini via Google AI Studio                      │
 │  • Evidence pack injected verbatim               │
 │  • Grounding rules enforced via system prompt    │
 │  • Structured JSON output (6 sections)           │
@@ -270,7 +270,7 @@ and enables components to be replaced or extended independently.
 - `agents/tools/image_score.py` — SCL cloud scoring and full image quality analysis
 - `agents/tools/best_images.py` — two-phase parallel scene selection pipeline
 - `agents/tools/image_validator_llm.py` — Gemini image quality validation
-- `agents/tools/llm_narrative.py` — Claude 3.5 Sonnet evidence-grounded narrative
+- `agents/tools/llm_narrative.py` — Gemini evidence-grounded narrative
 - `agents/tools/report_bundle.py` — deterministic NDVI interpretation and confidence scoring
 
 **Output Layer:**
@@ -394,7 +394,7 @@ AI_LIMITATIONS = """
 **The AI components in Keryos have important limitations that affect how their
 outputs should be interpreted:**
 
-**Claude 3.5 Sonnet (narrative generation):**
+**Gemini (narrative generation):**
 - The model generates text grounded in the evidence pack injected into the prompt.
   It cannot access field knowledge, local weather records, or crop calendars
   beyond what is provided.
@@ -417,8 +417,8 @@ outputs should be interpreted:**
 - The model's visual descriptions ("observed_features") are interpretations of
   the RGB composite, not the full multispectral signal.
 
-**Vertex AI dependency:**
-- Both LLM features require active GCP credentials and Vertex AI API access.
+**Google AI Studio dependency:**
+- Both LLM features require a GEMINI_API_KEY from Google AI Studio.
   All LLM calls fail open — if the API is unavailable, the pipeline continues
   with deterministic outputs.
 - API latency (typically 2–8 seconds per call) adds to total pipeline runtime.
@@ -463,7 +463,7 @@ would enable processing of 100s of claims per hour, enabling use by insurance
 companies at scale.
 
 **Model fine-tuning:**
-Fine-tuning Claude or an open-source VLM on a labelled dataset of
+Fine-tuning Gemini or an open-source VLM on a labelled dataset of
 (satellite image, NDVI, claim outcome) triples could substantially improve
 the AI reasoning layer's accuracy and reduce hallucination risk.
 
@@ -584,8 +584,8 @@ REFERENCES = [
         "relevance": "Sentinel-2 technical reference",
     },
     {
-        "key": "Anthropic2024",
-        "citation": ("Anthropic (2024). Claude 3 Model Card. https://www.anthropic.com/claude-3-model-card"),
+        "key": "Google2024",
+        "citation": ("Google (2024). Gemini API Documentation. https://ai.google.dev/gemini-api/docs"),
         "relevance": "AI model used for image validation and narrative generation",
     },
 ]
@@ -676,7 +676,7 @@ RESEARCH_QUESTIONS = [
         "motivation": (
             "AI availability, latency, and cost are variable.  If the "
             "deterministic baseline is defensible on its own, the system can "
-            "be deployed without Vertex AI credentials — increasing accessibility."
+            "be deployed without a Gemini API key — increasing accessibility."
         ),
         "approach": (
             "Run the pipeline with all AI flags disabled.  Evaluate whether the "
@@ -737,7 +737,7 @@ DESIGN_DECISIONS = [
         "decision": "Python as the primary language",
         "rationale": (
             "Python has the dominant ecosystem for geospatial data science "
-            "(NumPy, Pillow, Shapely), AI SDK integration (Anthropic, Google ADK), "
+            "(NumPy, Pillow, Shapely), AI SDK integration (Gemini, Google ADK), "
             "and rapid prototyping (Streamlit).  R offers strong statistical "
             "libraries but lacks web deployment options.  Java offers better "
             "performance but significantly longer development cycles for a college project."
@@ -794,7 +794,7 @@ DESIGN_DECISIONS = [
         "decision": "Fail-open AI design (LLM as optional layer)",
         "rationale": (
             "Insurance claim processing cannot depend on a third-party API being "
-            "available.  If Vertex AI is unreachable, the claim still needs an "
+            "available.  If the Gemini API is unreachable, the claim still needs an "
             "assessment.  By designing the deterministic NDVI pipeline as the "
             "primary evidence source and AI as a supplementary layer, the system "
             "remains fully functional without LLM credentials."

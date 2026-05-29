@@ -593,9 +593,9 @@ def _ai_section_blocks(ai_assessment: dict, ai_narrative: str, st: dict) -> list
     is_struct = bool(ai_assessment) and isinstance(ai_assessment, dict)
     is_fallback = ai_assessment.get("fallback", True) if is_struct else True
     model_txt = (
-        "Deterministic baseline  (Vertex AI not enabled)"
+        "Deterministic baseline  (AI narrative not enabled)"
         if is_fallback
-        else "Claude 3.5 Sonnet  ·  Google Cloud Vertex AI"
+        else "Gemini  ·  Google AI Studio"
     )
 
     exec_sum = (ai_assessment.get("executive_summary") if is_struct else None) or ai_narrative
@@ -1500,7 +1500,7 @@ def generate_summary_pdf(report: dict) -> bytes:
     )
     if exec_text:
         is_fallback = ai_assess.get("fallback", True) if isinstance(ai_assess, dict) else True
-        model_lbl = "Deterministic baseline" if is_fallback else "Claude 3.5 Sonnet · Vertex AI"
+        model_lbl = "Deterministic baseline" if is_fallback else "Gemini · Google AI Studio"
         ai_box = Table(
             [
                 [

@@ -710,7 +710,7 @@ def render_ai_narrative(report: dict) -> None:
 
     if assessment:
         is_fallback = assessment.get("fallback", False)
-        model_lbl = "Deterministic fallback" if is_fallback else "Claude 3.5 Sonnet · Vertex AI"
+        model_lbl = "Deterministic fallback" if is_fallback else "Gemini · Google AI Studio"
         fallback_badge = (
             '<span class="k-chip k-chip-off" style="font-size:0.62rem;padding:0.13rem 0.5rem;">'
             "Fallback</span>"
@@ -819,7 +819,7 @@ def render_ai_narrative(report: dict) -> None:
             f'<div style="margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem;">'
             f"<span style=\"font-family:'JetBrains Mono',monospace;font-size:0.65rem;"
             f'letter-spacing:0.06em;color:var(--text-2);text-transform:uppercase;">'
-            f'Assessment</span><span class="ai-badge">Claude 3.5 Sonnet · Vertex AI</span></div>'
+            f'Assessment</span><span class="ai-badge">Gemini · Google AI Studio</span></div>'
             f'<p style="margin:0;font-size:0.95rem;line-height:1.7;color:var(--text-1);">'
             f"{legacy_text}</p></div>",
             unsafe_allow_html=True,
@@ -913,9 +913,9 @@ sowing season (typically 30–90 days) for accurate results.
 
 **What are the AI features?**
 *AI Image Validation* uses Gemini to check that the satellite image is
-usable (not mostly cloud or black). *AI Narrative* uses Claude 3.5 Sonnet to
-generate a professional 2–3 sentence assessment. Both require GCP Vertex AI
-credentials and are disabled by default.
+usable (not mostly cloud or black). *AI Narrative* uses Gemini to
+generate a professional assessment. Both require a GEMINI_API_KEY
+from Google AI Studio and are disabled by default.
 
 **What does Composite Mean NDVI mean?**
 A weighted average of NDVI across all valid satellite passes in your date window,
@@ -1345,7 +1345,7 @@ def render_visual_pipeline() -> None:
                 "Structured JSON output (6 sections)",
                 "Deterministic fallback on any failure",
             ],
-            "params": "Claude 3.5 Sonnet · Vertex AI · max_tokens=800",
+            "params": "Gemini · Google AI Studio · max_tokens=800",
         },
         {
             "num": "09",

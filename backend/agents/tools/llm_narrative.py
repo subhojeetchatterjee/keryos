@@ -32,7 +32,7 @@ _GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:g
 
 
 def _narrative_model() -> str:
-    return os.environ.get("GEMINI_NARRATIVE_MODEL_ID", "gemini-1.5-flash")
+    return os.environ.get("GEMINI_NARRATIVE_MODEL_ID", "gemini-2.5-flash-lite")
 
 
 def _fmt(v: object, decimals: int = 3) -> str:
@@ -297,7 +297,7 @@ def generate_claim_narrative(
     try:
         r = None
         for attempt in range(3):
-            r = requests.post(url, headers={"X-goog-api-key": api_key}, json=payload, timeout=120)
+            r = requests.post(url, params={"key": api_key}, json=payload, timeout=120)
             if r.status_code not in (429, 503):
                 break
             wait = 15 * (attempt + 1)

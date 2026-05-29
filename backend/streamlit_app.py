@@ -139,14 +139,14 @@ def main() -> None:
         enable_narrative = st.checkbox(
             "AI Narrative",
             value=False,
-            help="Uses Claude 3.5 Sonnet via Vertex AI to write a professional assessment",
+            help="Uses Gemini via Google AI Studio to write a professional assessment",
         )
 
         os.environ["ENABLE_LLM_VALIDATION"] = "true" if enable_llm else "false"
         os.environ["ENABLE_AI_NARRATIVE"] = "true" if enable_narrative else "false"
 
-        if enable_llm or enable_narrative:
-            st.info("Requires GEMINI_API_KEY environment variable.")
+        if (enable_llm or enable_narrative) and not os.environ.get("GEMINI_API_KEY"):
+            st.warning("GEMINI_API_KEY not set — AI features will fall back to deterministic mode.")
 
         st.markdown('<hr style="border-color:rgba(0,214,143,0.09);margin:1rem 0;">', unsafe_allow_html=True)
         render_faq()

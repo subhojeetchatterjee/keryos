@@ -47,7 +47,7 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
     Fails open — always returns a usable dict.
     """
     api_key = os.environ.get("GEMINI_API_KEY", "")
-    model = os.environ.get("GEMINI_VALIDATOR_MODEL_ID", "gemini-1.5-flash")
+    model = os.environ.get("GEMINI_VALIDATOR_MODEL_ID", "gemini-2.5-flash-lite")
     url = _GEMINI_URL.format(model=model)
 
     payload = {
@@ -65,7 +65,7 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
     try:
         r = None
         for attempt in range(3):
-            r = requests.post(url, headers={"X-goog-api-key": api_key}, json=payload, timeout=60)
+            r = requests.post(url, params={"key": api_key}, json=payload, timeout=60)
             if r.status_code not in (429, 503):
                 break
             wait = 10 * (attempt + 1)

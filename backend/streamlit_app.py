@@ -6,6 +6,11 @@ import os
 import time
 import traceback
 from datetime import date, datetime
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent / ".env")
 
 import folium
 import streamlit as st

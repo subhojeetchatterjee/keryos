@@ -1,11 +1,8 @@
-import base64
 import json
 import logging
 import os
 import re
 from typing import Any, cast
-
-import time
 
 import requests
 
@@ -275,7 +272,7 @@ def generate_claim_narrative(
     )
 
     all_images = [image_b64] if image_b64 else []
-    for img in (extra_images_b64 or []):
+    for img in extra_images_b64 or []:
         if img and img not in all_images:
             all_images.append(img)
 
@@ -284,7 +281,8 @@ def generate_claim_narrative(
         f"You are provided with {n_images} cloud-free Sentinel-2 true-colour scenes "
         f"(ranked best-first by composite quality score). Use all images together for a "
         f"richer visual assessment — cross-reference spectral patterns across scenes.\n\n"
-        if n_images > 1 else ""
+        if n_images > 1
+        else ""
     )
 
     prompt = (
@@ -299,13 +297,17 @@ def generate_claim_narrative(
 
     # Fallback chain — tries each model in order on 429/503
     override = os.environ.get("GEMINI_NARRATIVE_MODEL_ID")
-    models = [override] if override else [
-        "gemini-3.1-flash-lite",   # 500 RPD — most headroom
-        "gemini-3.5-flash",        # 20 RPD
-        "gemini-2.5-flash",        # 20 RPD
-        "gemini-3-flash",          # 20 RPD
-        "gemini-2.5-flash-lite",   # 20 RPD — last resort
-    ]
+    models = (
+        [override]
+        if override
+        else [
+            "gemini-3.1-flash-lite",  # 500 RPD — most headroom
+            "gemini-3.5-flash",  # 20 RPD
+            "gemini-2.5-flash",  # 20 RPD
+            "gemini-3-flash",  # 20 RPD
+            "gemini-2.5-flash-lite",  # 20 RPD — last resort
+        ]
+    )
 
     parts: list[Any] = []
     for img_b64 in all_images:

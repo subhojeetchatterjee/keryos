@@ -1,9 +1,7 @@
-import base64
 import json
 import logging
 import os
 import re
-
 import time
 
 import requests
@@ -49,13 +47,17 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
     api_key = os.environ.get("GEMINI_API_KEY", "")
     # Fallback chain — tries each model in order on 429/503
     override = os.environ.get("GEMINI_VALIDATOR_MODEL_ID")
-    models = [override] if override else [
-        "gemini-3.1-flash-lite",   # 500 RPD — most headroom
-        "gemini-3.5-flash",        # 20 RPD
-        "gemini-2.5-flash",        # 20 RPD
-        "gemini-3-flash",          # 20 RPD
-        "gemini-2.5-flash-lite",   # 20 RPD — last resort
-    ]
+    models = (
+        [override]
+        if override
+        else [
+            "gemini-3.1-flash-lite",  # 500 RPD — most headroom
+            "gemini-3.5-flash",  # 20 RPD
+            "gemini-2.5-flash",  # 20 RPD
+            "gemini-3-flash",  # 20 RPD
+            "gemini-2.5-flash-lite",  # 20 RPD — last resort
+        ]
+    )
 
     payload = {
         "contents": [

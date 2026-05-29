@@ -12,14 +12,14 @@ from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent / ".env")
 
-import folium
-import streamlit as st
-from folium.plugins import Draw
-from streamlit_folium import st_folium
+import folium  # noqa: E402
+import streamlit as st  # noqa: E402
+from folium.plugins import Draw  # noqa: E402
+from streamlit_folium import st_folium  # noqa: E402
 
-from agents.tools.geojson_utils import validate_aoi
-from agents.tools.report_bundle import get_report_bundle_for_ui
-from utils.messages import (
+from agents.tools.geojson_utils import validate_aoi  # noqa: E402
+from agents.tools.report_bundle import get_report_bundle_for_ui  # noqa: E402
+from utils.messages import (  # noqa: E402
     AOI_INVALID_COORDS,
     AOI_NOT_POLYGON,
     AOI_TOO_LARGE,
@@ -39,7 +39,7 @@ from utils.messages import (
     RATE_LIMITED,
     TIMEOUT,
 )
-from utils.ui_components import (
+from utils.ui_components import (  # noqa: E402
     inject_accessibility_css,
     render_ai_narrative,
     render_alternatives,

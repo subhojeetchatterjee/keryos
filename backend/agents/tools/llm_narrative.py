@@ -5,8 +5,9 @@ import os
 import re
 from typing import Any, cast
 
-from google import genai
-from google.genai import types
+import time
+
+import requests
 
 _log = logging.getLogger(__name__)
 
@@ -27,12 +28,11 @@ NON-NEGOTIABLE RULES:
 """
 
 
-def _client() -> genai.Client:
-    return genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
+_GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 
 def _narrative_model() -> str:
-    return os.environ.get("GEMINI_NARRATIVE_MODEL_ID", "gemini-2.0-flash")
+    return os.environ.get("GEMINI_NARRATIVE_MODEL_ID", "gemini-1.5-flash")
 
 
 def _fmt(v: object, decimals: int = 3) -> str:
@@ -281,18 +281,30 @@ def generate_claim_narrative(
         f"Respond ONLY with valid JSON matching this exact schema:\n{_OUTPUT_SCHEMA}"
     )
 
-    contents: list[Any] = []
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    url = _GEMINI_URL.format(model=_narrative_model())
+
+    parts: list[Any] = []
     if image_b64:
-        contents.append(types.Part.from_bytes(data=base64.b64decode(image_b64), mime_type="image/png"))
-    contents.append(_ANALYST_SYSTEM + "\n\n" + prompt)
+        parts.append({"inline_data": {"mime_type": "image/png", "data": image_b64}})
+    parts.append({"text": _ANALYST_SYSTEM + "\n\n" + prompt})
+
+    payload = {
+        "contents": [{"parts": parts}],
+        "generationConfig": {"maxOutputTokens": 800, "temperature": 0.2},
+    }
 
     try:
-        response = _client().models.generate_content(
-            model=_narrative_model(),
-            contents=contents,
-            config=types.GenerateContentConfig(max_output_tokens=800, temperature=0.2),
-        )
-        raw = response.text.strip()
+        r = None
+        for attempt in range(3):
+            r = requests.post(url, headers={"X-goog-api-key": api_key}, json=payload, timeout=120)
+            if r.status_code not in (429, 503):
+                break
+            wait = 15 * (attempt + 1)
+            _log.warning("Gemini narrative %d, retrying in %ds", r.status_code, wait)
+            time.sleep(wait)
+        r.raise_for_status()
+        raw = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
         _log.debug("AI narrative response: %d chars", len(raw))
 
         parsed = _parse_response(raw)

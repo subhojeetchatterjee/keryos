@@ -80,6 +80,8 @@ def validate_image_with_vertex_ai(image_b64: str, date: str) -> dict:
                 break
             _log.warning("Gemini validator %d on %s for %s, trying next model", r.status_code, model, date)
             time.sleep(2)
+        if r is None:
+            raise RuntimeError("No response from any Gemini model")
         r.raise_for_status()
         text = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
         _log.debug("Gemini validator response for %s: %s", date, text[:120])

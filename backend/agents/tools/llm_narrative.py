@@ -327,6 +327,8 @@ def generate_claim_narrative(
             if r.status_code not in (429, 503):
                 break
             _log.warning("Gemini narrative %d on %s, trying next model", r.status_code, model)
+        if r is None:
+            raise RuntimeError("No response from any Gemini model")
         r.raise_for_status()
         raw = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
         _log.debug("AI narrative response: %d chars", len(raw))

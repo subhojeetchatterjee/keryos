@@ -255,9 +255,12 @@ def get_best3_truecolor_auto(
     fetch_workers = min(fetch_n, 4)
     out: list[dict] = []
 
+    # LLM validator is intentionally NOT passed into parallel phase —
+    # running it per-scene would exhaust free-tier rate limits instantly.
+    # It is applied only to the best scene after ranking (see below).
     with ThreadPoolExecutor(max_workers=fetch_workers) as pool:
         ordered_futures: list[Any] = [
-            pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, llm_validator)
+            pool.submit(_fetch_full_scene, aoi_geojson, item, full_px, max_cloud, None)
             for item in probed[:fetch_n]
         ]
         for future in ordered_futures:
@@ -284,7 +287,12 @@ def get_best3_truecolor_auto(
     )
     out = out[:3]
 
+    # ── LLM validation: best scene only (1 API call instead of N) ────────────
     best = out[0]
+    if llm_validator is not None:
+        llm_check = llm_validator(best["png_b64"], best["date"])
+        best["llm_validation"] = llm_check
+        _log.info("LLM validation for best scene %s: valid=%s", best["date"], llm_check.get("is_valid"))
     best_q = best.get("quality", {})
     _log.info(
         "Pipeline complete: returning %d scene(s) | best=%s grade=%s "
